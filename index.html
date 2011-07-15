@@ -146,6 +146,9 @@ function onload() {
 }
 
 function loadLocationName(position) {
+  // Until we actually have a name of a place, just put in the Lat/Long.
+  document.getElementById("location").innerText = (Math.round(position.latitude * 100) / 100).toString() + ", " + (Math.round(position.longitude * 100) / 100).toString();
+
   var geocoder = new google.maps.Geocoder();
   var location = new google.maps.LatLng(position.latitude, position.longitude);
   geocoder.geocode({ "location": location }, function (results, status) {
@@ -220,7 +223,7 @@ function setMessage(text) {
   <canvas id="yaxis" width="0" height="0"></canvas>
   <canvas id="graph" width="0" height="0"></canvas>
   <header>
-    <h1 id="location"><span id="location">Sioux Falls, SD, USA</span> &ndash; <span id="graphtype"></span></h1>
+    <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
   </header>
 </div>
 <div id="loading">
