@@ -58,6 +58,7 @@ header h1 {
 var g = null;
 var data = null;
 
+/*
 data = [
 { day: "2011-07-13", hour:  7, temp: 70, apparent: 72, dew: 59 },
 { day: "2011-07-13", hour:  8, temp: 70, apparent: 71, dew: 57 },
@@ -90,14 +91,17 @@ data = [
 { day: "2011-07-14", hour: 11, temp: 76, apparent: 81, dew: 71 },
 { day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70 },
 ];
+*/
 
 function redraw() {
   if (!data) return;
-  g.getGraphCanvas().width = data.length * 40;
+  //g.getGraphCanvas().width = data.length * 40;
   g.getGraphCanvas().height = Math.min(window.innerHeight - 5, 200);
   g.getYAxisCanvas().width = 30;
   g.getYAxisCanvas().height = Math.min(window.innerHeight - 5, 200);
-  g.setLogicalXBounds(0, data.length - 1);
+  g.setGridWidth(30);
+  g.setMaximumGridHeight(30);
+  g.setMaximumVerticalSpace(300);
 
   if (data.length > 0) {
     var minY = 1000;

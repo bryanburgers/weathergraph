@@ -19,6 +19,7 @@ SecondGriffin = window.SecondGriffin || { };
     this.yAxisCanvas = yAxisCanvas;
     this.logicalMinY = 50;
     this.logicalMaxY = 100;
+    this.gridWidth = 50;
 
     this.logicalMinX = 0;
     this.logicalMaxX = 6;
@@ -26,28 +27,55 @@ SecondGriffin = window.SecondGriffin || { };
     this.gridlineColor = "rgb(200, 200, 200)";
     this.outlineColor = "rgb(150, 150, 150)";
     this.textColor = "rgb(0,0,0)";
+    this.dayBackground = "rgb(245,245,245)";
+    this.nightBackground = "rgb(220,220,220)";
+
+    this.topSpacing = 10;
+    this.leftSpacing = 10;
+    this.rightSpacing = 10;
+    this.bottomSpacing = 0;
+    this.horizontalAxisHeight = 30;
 
     return this;
   };
 
+  graph.TEMPERATURE = 1;
+
   graph.prototype.getGraphCanvas = function() {
     return this.graphCanvas;
-  }
+  };
   graph.prototype.getYAxisCanvas = function() {
     return this.yAxisCanvas;
-  }
+  };
 
   graph.prototype.setLogicalYBounds = function(min, max) {
     this.logicalMinY = min;
     this.logicalMaxY = max;
-  }
+  };
   graph.prototype.setLogicalXBounds = function(min, max) {
     this.logicalMinX = min;
     this.logicalMaxX = max;
-  }
+  };
+
+  // Set the width of a grid. This size will be used regardless, and the graph
+  // will be allowed to be as big as it wants horizontally.
+  graph.prototype.setGridWidth = function(gridWidth) {
+    this.gridWidth = gridWidth;
+  };
+
+  // Set the maximum height of a grid. This size will be used, unless using
+  // it would result in the height of the graph being larger than MaximumVerticalSpace.
+  graph.prototype.setMaximumGridHeight = function(gridHeight) {
+    this.maximumGridHeight = gridHeight;
+  };
+
+  // Set the maximum amount of space the graph can take up.
+  graph.prototype.setMaximumVerticalSpace = function(verticalSpace) {
+    this.maximumVerticalSpace = verticalSpace;
+  };
 
   graph.prototype.translateX = function(x, rect) {
-    var tx = (x + 1 - this.logicalMinX) * this.xspacing; // The actual value.
+    var tx = (x + 1 - this.logicalMinX) * this.gridWidth + this.leftSpacing; // The actual value.
     return Math.round(tx) - 0.5; // Rendering looks better if it's exactly on a half pixel.
   };
 
@@ -56,47 +84,79 @@ SecondGriffin = window.SecondGriffin || { };
     return Math.round(ty) - 0.5; // Rendering looks better if it's exactly on a half pixel.
   };
 
-  graph.prototype.redraw = function(data) {
+  graph.prototype.redraw = function(data, mode) {
     var canvas = this.graphCanvas;
     var ctx = canvas.getContext("2d");
     var yAxisCanvas = this.yAxisCanvas;
     var yctx = yAxisCanvas.getContext("2d");
+    this.setLogicalXBounds(0, data.length - 1);
 
-    var rect = new Rectangle(0, 10, canvas.width, canvas.height - 40);
+    canvas.width = (data.length + 1) * this.gridWidth + this.leftSpacing + this.rightSpacing;
 
-    this.xspacing = rect.width / (this.logicalMaxX - this.logicalMinX + 2);
+    var rect = new Rectangle(
+      this.leftSpacing,
+      this.topSpacing,
+      canvas.width - this.leftSpacing - this.rightSpacing,
+      canvas.height - this.topSpacing - this.bottomSpacing - this.horizontalAxisHeight);
+
     this.yspacing = rect.height / (this.logicalMaxY - this.logicalMinY);
 
-    // Really no need to clip, since we keep our gridlines in the bounds, anyway.
-/*
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(rect.left, rect.top);
-    ctx.lineTo(rect.right, rect.top);
-    ctx.lineTo(rect.right, rect.bottom);
-    ctx.lineTo(rect.left, rect.bottom);
-    ctx.closePath();
-    ctx.clip();
-*/
-
+    this.drawBackground(ctx, data, rect);
     this.drawLines(ctx, data, rect);
     this.drawData(ctx, data, rect);
-
-    ctx.restore();
-
     this.drawXAxis(ctx, data, rect);
     this.drawYAxis(yctx, data, rect);
   };
 
+  graph.prototype.drawBackground = function(ctx, data, rect) {
+    ctx.save();
+
+    var gradient = ctx.createLinearGradient(0, 0, 0, rect.height);
+    ctx.fillStyle = this.dayBackground;
+    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+    var fillBackground = function(i) {
+      var xStart = this.translateX(i - 0.5, rect);
+      var xEnd = this.translateX(i + 12.5, rect);
+    
+      var gradient2 = ctx.createLinearGradient(xStart, 0, xEnd, 0);
+      gradient2.addColorStop(0, this.dayBackground);
+      gradient2.addColorStop(1/13, this.nightBackground);
+      gradient2.addColorStop(12/13, this.nightBackground);
+      gradient2.addColorStop(1, this.dayBackground);
+    
+      //ctx.fillStyle = "rgb(200,200,200)";
+      ctx.fillStyle = gradient2;
+      ctx.fillRect(xStart, rect.y, xEnd - xStart, rect.height);
+
+    };
+
+    var startHour = data[0].hour;
+    if (startHour >= 18) {
+      var i = 18 - data[0].hour;
+      fillBackground.apply(this, [i]);
+    }
+    else if (startHour <= 7) {
+      var i = -6 - data[0].hour;
+      fillBackground.apply(this, [i]);
+    }
+    else { } // We're in the daytime, so we don't need to back-draw a night-time background.
+
+
+    for (var i = 0; data[i]; i++) {
+      var hour = data[i].hour;
+      if (hour == 18) {
+        // Need to use apply so we can have the right 'this', which is used for translateX.
+        fillBackground.apply(this, [i]);
+      }
+    }
+
+    
+    ctx.restore();
+  };
+
   graph.prototype.drawLines = function(ctx, data, rect) {
     ctx.save();
-    var gradient = ctx.createLinearGradient(0, 0, 0, rect.height);
-    gradient.addColorStop(0, "rgb(230, 230, 230)");
-    gradient.addColorStop(0.4, "rgb(245, 245, 245)");
-    gradient.addColorStop(0.6, "rgb(245, 245, 245)");
-    gradient.addColorStop(1, "rgb(230, 230, 230)");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
 
     ctx.strokeStyle = this.gridlineColor;
     var startY = Math.floor(this.logicalMinY / 10) * 10;
