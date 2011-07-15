@@ -7,6 +7,7 @@
 * {
   margin: 0;
   padding: 0;
+  font-family: Verdana, arial, sans-serif;
 }
 
 #yaxis {
@@ -21,8 +22,35 @@
   text-align: center;
 }
 
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+header h1 {
+  display: inline-block;
+  margin: 0 auto;
+  border-bottom-left-radius: 1em;
+  border-bottom-right-radius: 1em;
+  background-color: rgba(255,255,255,0.75);
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+  padding: 0 1em;
+}
+
+header h1 {
+  font-size: 1em;
+  font-weight: normal;
+}
+#graphtype {
+  font-style: italic;
+}
+
 </style>
 
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
 <script src="weatherParser.js"></script>
 <script src="graph.js"></script>
 <script>
@@ -30,8 +58,7 @@
 var g = null;
 var data = null;
 
-/*
-var data = [
+data = [
 { day: "2011-07-13", hour:  7, temp: 70, apparent: 72, dew: 59 },
 { day: "2011-07-13", hour:  8, temp: 70, apparent: 71, dew: 57 },
 { day: "2011-07-13", hour:  9, temp: 71, apparent: 72, dew: 59 },
@@ -63,7 +90,6 @@ var data = [
 { day: "2011-07-14", hour: 11, temp: 76, apparent: 81, dew: 71 },
 { day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70 },
 ];
-*/
 
 function redraw() {
   if (!data) return;
@@ -92,8 +118,9 @@ function redraw() {
     g.setLogicalYBounds(minY, maxY);
   }
 
-
   g.redraw(data);
+  document.getElementById('graphtype').innerText = 'Temperature';
+  document.getElementById('loaded').style.display = 'block';
 }
 
 
@@ -103,16 +130,47 @@ function onload() {
   var yAxisCanvas = document.getElementById("yaxis");
   g = new SecondGriffin.WeatherGraph(graph, yaxis);
   window.addEventListener("resize", redraw, false);
-  //redraw();
 
   setMessage("Retrieving location.");
 
   if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
     navigator.geolocation.getCurrentPosition(
-      function (success) { loadData(success.coords); },
+      function (success) { loadData(success.coords); loadLocationName(success.coords); },
       function (failure) { setMessage("Failed to retrieve location."); }
     );
   }
+}
+
+function loadLocationName(position) {
+  var geocoder = new google.maps.Geocoder();
+  var location = new google.maps.LatLng(position.latitude, position.longitude);
+  geocoder.geocode({ "location": location }, function (results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      var found = false;
+      var location;
+      for (var i = 0; results[i]; i++) {
+        if (found) break;
+
+        var result = results[i];
+	console.log(result);
+
+        for (var j = 0; result.types[j]; j++) {
+	  if (found) break;
+
+	  if (result.types[j] == "political") {
+	    location = result.formatted_address;
+	    found = true;
+	  }
+	}
+      }
+
+      if (!found) {
+        location = result[0].formatted_address;
+      }
+
+      document.getElementById("location").innerText = location;
+    }
+  });
 }
 
 function loadData(position) {
@@ -154,8 +212,15 @@ function setMessage(text) {
 </script>
 </head>
 <body onload="onload()">
-<canvas id="yaxis" width="0" height="0"></canvas>
-<canvas id="graph" width="0" height="0"></canvas>
-<div id="message">Loading.</div>
+<div id="loaded" style="display: none;">
+  <canvas id="yaxis" width="0" height="0"></canvas>
+  <canvas id="graph" width="0" height="0"></canvas>
+  <header>
+    <h1 id="location"><span id="location">Sioux Falls, SD, USA</span> &ndash; <span id="graphtype"></span></h1>
+  </header>
+</div>
+<div id="loading">
+  <div id="message">Loading.</div>
+</div>
 </body>
 </html>
