@@ -55,6 +55,13 @@ header h1 {
   font-style: italic;
 }
 
+.selection {
+  padding: 0 0.75em;
+}
+.selection a {
+  margin: 0 0.25em;
+}
+
 </style>
 
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
@@ -64,76 +71,60 @@ header h1 {
 
 var g = null;
 var data = null;
+var mode = SecondGriffin.WeatherGraph.TEMPERATURE;
 
-/*
 data = [
-{ day: "2011-07-13", hour:  7, temp: 70, apparent: 72, dew: 59 },
-{ day: "2011-07-13", hour:  8, temp: 70, apparent: 71, dew: 57 },
-{ day: "2011-07-13", hour:  9, temp: 71, apparent: 72, dew: 59 },
-{ day: "2011-07-13", hour: 10, temp: 72, apparent: 78, dew: 60 },
-{ day: "2011-07-13", hour: 11, temp: 77, apparent: 81, dew: 61 },
-{ day: "2011-07-13", hour: 12, temp: 79, apparent: 88, dew: 59 },
-{ day: "2011-07-13", hour: 13, temp: 82, apparent: 89, dew: 62 },
-{ day: "2011-07-13", hour: 14, temp: 80, apparent: 90, dew: 62 },
-{ day: "2011-07-13", hour: 15, temp: 81, apparent: 91, dew: 63 },
-{ day: "2011-07-13", hour: 16, temp: 83, apparent: 92, dew: 65 },
-{ day: "2011-07-13", hour: 17, temp: 81, apparent: 89, dew: 65 },
-{ day: "2011-07-13", hour: 18, temp: 79, apparent: 88, dew: 68 },
-{ day: "2011-07-13", hour: 19, temp: 78, apparent: 85, dew: 69 },
-{ day: "2011-07-13", hour: 20, temp: 76, apparent: 76, dew: 71 },
-{ day: "2011-07-13", hour: 21, temp: 72, apparent: 72, dew: 70 },
-{ day: "2011-07-13", hour: 22, temp: 70, apparent: 70, dew: 59 },
-{ day: "2011-07-13", hour: 23, temp: 70, apparent: 70, dew: 57 },
-{ day: "2011-07-14", hour:  0, temp: 71, apparent: 71, dew: 59 },
-{ day: "2011-07-14", hour:  1, temp: 72, apparent: 72, dew: 60 },
-{ day: "2011-07-14", hour:  2, temp: 77, apparent: 77, dew: 61 },
-{ day: "2011-07-14", hour:  3, temp: 79, apparent: 88, dew: 59 },
-{ day: "2011-07-14", hour:  4, temp: 82, apparent: 89, dew: 62 },
-{ day: "2011-07-14", hour:  5, temp: 80, apparent: 90, dew: 62 },
-{ day: "2011-07-14", hour:  6, temp: 81, apparent: 91, dew: 63 },
-{ day: "2011-07-14", hour:  7, temp: 83, apparent: 92, dew: 65 },
-{ day: "2011-07-14", hour:  8, temp: 81, apparent: 89, dew: 65 },
-{ day: "2011-07-14", hour:  9, temp: 79, apparent: 88, dew: 68 },
-{ day: "2011-07-14", hour: 10, temp: 78, apparent: 85, dew: 69 },
-{ day: "2011-07-14", hour: 11, temp: 76, apparent: 81, dew: 71 },
-{ day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70 },
+{ day: "2011-07-13", hour:  7, temp: 70, apparent: 72, dew: 59, wind: 3, windDirection: "N", gust: null },
+{ day: "2011-07-13", hour:  8, temp: 70, apparent: 71, dew: 57, wind: 4, windDirection: "NNE", gust: null },
+{ day: "2011-07-13", hour:  9, temp: 71, apparent: 72, dew: 59, wind: 5, windDirection: "NE", gust: 22 },
+{ day: "2011-07-13", hour: 10, temp: 72, apparent: 78, dew: 60, wind: 7, windDirection: "ENE", gust: 23 },
+{ day: "2011-07-13", hour: 11, temp: 77, apparent: 81, dew: 61, wind: 9, windDirection: "E", gust: 28 },
+{ day: "2011-07-13", hour: 12, temp: 79, apparent: 88, dew: 59, wind: 10, windDirection: "ESE", gust: null },
+{ day: "2011-07-13", hour: 13, temp: 82, apparent: 89, dew: 62, wind: 11, windDirection: "SE", gust: null },
+{ day: "2011-07-13", hour: 14, temp: 80, apparent: 90, dew: 62, wind: 14, windDirection: "SSE", gust: null },
+{ day: "2011-07-13", hour: 15, temp: 81, apparent: 91, dew: 63, wind: 15, windDirection: "S", gust: null },
+{ day: "2011-07-13", hour: 16, temp: 83, apparent: 92, dew: 65, wind: 16, windDirection: "SSW", gust: null },
+{ day: "2011-07-13", hour: 17, temp: 81, apparent: 89, dew: 65, wind: 17, windDirection: "SW", gust: null },
+{ day: "2011-07-13", hour: 18, temp: 79, apparent: 88, dew: 68, wind: 19, windDirection: "WSW", gust: 22 },
+{ day: "2011-07-13", hour: 19, temp: 78, apparent: 85, dew: 69, wind: 20, windDirection: "W", gust: 28 },
+{ day: "2011-07-13", hour: 20, temp: 76, apparent: 76, dew: 71, wind: 21, windDirection: "WNW", gust: null },
+{ day: "2011-07-13", hour: 21, temp: 72, apparent: 72, dew: 70, wind: 24, windDirection: "NW", gust: null },
+{ day: "2011-07-13", hour: 22, temp: 70, apparent: 70, dew: 59, wind: 25, windDirection: "NNW", gust: null },
+{ day: "2011-07-13", hour: 23, temp: 70, apparent: 70, dew: 57, wind: 26, windDirection: "N", gust: 21 },
+{ day: "2011-07-14", hour:  0, temp: 71, apparent: 71, dew: 59, wind: 29, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour:  1, temp: 72, apparent: 72, dew: 60, wind: 30, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour:  2, temp: 77, apparent: 77, dew: 61, wind: 31, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour:  3, temp: 79, apparent: 88, dew: 59, wind: 10, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour:  4, temp: 82, apparent: 89, dew: 62, wind: 10, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour:  5, temp: 80, apparent: 90, dew: 62, wind: 10, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour:  6, temp: 81, apparent: 91, dew: 63, wind: 10, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour:  7, temp: 83, apparent: 92, dew: 65, wind: 10, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour:  8, temp: 81, apparent: 89, dew: 65, wind: 10, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour:  9, temp: 79, apparent: 88, dew: 68, wind: 10, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour: 10, temp: 78, apparent: 85, dew: 69, wind: 10, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour: 11, temp: 76, apparent: 81, dew: 71, wind: 10, windDirection: "N", gust: null },
+{ day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70, wind: 10, windDirection: "N", gust: null },
 ];
-*/
 
 function redraw() {
   if (!data) return;
-  //g.getGraphCanvas().width = data.length * 40;
-  g.getGraphCanvas().height = Math.min(window.innerHeight - 5, 200);
   g.getYAxisCanvas().width = 30;
-  g.getYAxisCanvas().height = Math.min(window.innerHeight - 5, 200);
   g.setGridWidth(30);
   g.setMaximumGridHeight(30);
   g.setMaximumVerticalSpace(300);
 
-  if (data.length > 0) {
-    var minY = 1000;
-    var maxY = -200;
-    for (var i = 0; data[i]; i++) {
-      var temp = data[i].temp;
-      var apparent = data[i].apparent;
-      var dew = data[i].dew;
-
-      var max = Math.max(temp, apparent, dew);
-      var min = Math.min(temp, apparent, dew);
-      var logMax = Math.ceil((max + 0.5) / 10) * 10;
-      var logMin = Math.floor((min - 0.5) / 10) * 10;
-      minY = Math.min(minY, logMin);
-      maxY = Math.max(maxY, logMax);
-    }
-
-    g.setLogicalYBounds(minY, maxY);
+  g.redraw(data, mode);
+  var graphtype = document.getElementById('graphtype');
+  switch (mode) {
+    case SecondGriffin.WeatherGraph.TEMPERATURE:
+      graphtype.innerText = 'Temperature';
+      break;
+    case SecondGriffin.WeatherGraph.WIND:
+      graphtype.innerText = 'Wind';
+      break;
   }
-
-  g.redraw(data);
-  document.getElementById('graphtype').innerText = 'Temperature';
   document.getElementById('loaded').style.display = 'block';
 }
-
 
 
 function onload() {
@@ -229,6 +220,17 @@ function setMessage(text) {
   }
 }
 
+function selectTemperature() {
+  mode = SecondGriffin.WeatherGraph.TEMPERATURE;
+  redraw();
+  return false;
+}
+
+function selectWind() {
+  mode = SecondGriffin.WeatherGraph.WIND;
+  redraw();
+  return false;
+}
 
 </script>
 </head>
@@ -240,6 +242,10 @@ function setMessage(text) {
   <header>
     <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
   </header>
+  <div class="selection">
+    <a href="#" onclick="return selectTemperature();">Temperature</a>
+    <a href="#" onclick="return selectWind();">Wind</a>
+  </div>
 </div>
 <div id="loading">
   <div id="message">Loading.</div>
