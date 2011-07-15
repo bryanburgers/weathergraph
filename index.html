@@ -51,7 +51,7 @@ header h1 {
 
 </style>
 
-<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
+<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
 <script src="weatherParser.js"></script>
 <script src="graph.js"></script>
 <script>
@@ -174,6 +174,11 @@ function loadLocationName(position) {
 
       if (!found) {
         location = result[0].formatted_address;
+      }
+
+      // If our string ends with ", USA", we want to remove it.
+      if (location.lastIndexOf(", USA") + 5 == location.length) {
+        location = location.substring(0, s.lastIndexOf(", USA"));
       }
 
       document.getElementById("location").innerText = location;
