@@ -11,16 +11,22 @@
 }
 
 #yaxis {
-  float: left;
   position: fixed;
   top: 0;
   left: 0;
+}
+
+#key {
+  position: fixed;
+  right: 0;
+  bottom: 0;
 }
 
 #message {
   padding: 1em;
   text-align: center;
 }
+
 
 header {
   position: fixed;
@@ -74,13 +80,13 @@ data = [
 { day: "2011-07-13", hour: 17, temp: 81, apparent: 89, dew: 65 },
 { day: "2011-07-13", hour: 18, temp: 79, apparent: 88, dew: 68 },
 { day: "2011-07-13", hour: 19, temp: 78, apparent: 85, dew: 69 },
-{ day: "2011-07-13", hour: 20, temp: 76, apparent: 81, dew: 71 },
-{ day: "2011-07-13", hour: 21, temp: 72, apparent: 80, dew: 70 },
-{ day: "2011-07-13", hour: 22, temp: 70, apparent: 72, dew: 59 },
-{ day: "2011-07-13", hour: 23, temp: 70, apparent: 71, dew: 57 },
-{ day: "2011-07-14", hour:  0, temp: 71, apparent: 72, dew: 59 },
-{ day: "2011-07-14", hour:  1, temp: 72, apparent: 78, dew: 60 },
-{ day: "2011-07-14", hour:  2, temp: 77, apparent: 81, dew: 61 },
+{ day: "2011-07-13", hour: 20, temp: 76, apparent: 76, dew: 71 },
+{ day: "2011-07-13", hour: 21, temp: 72, apparent: 72, dew: 70 },
+{ day: "2011-07-13", hour: 22, temp: 70, apparent: 70, dew: 59 },
+{ day: "2011-07-13", hour: 23, temp: 70, apparent: 70, dew: 57 },
+{ day: "2011-07-14", hour:  0, temp: 71, apparent: 71, dew: 59 },
+{ day: "2011-07-14", hour:  1, temp: 72, apparent: 72, dew: 60 },
+{ day: "2011-07-14", hour:  2, temp: 77, apparent: 77, dew: 61 },
 { day: "2011-07-14", hour:  3, temp: 79, apparent: 88, dew: 59 },
 { day: "2011-07-14", hour:  4, temp: 82, apparent: 89, dew: 62 },
 { day: "2011-07-14", hour:  5, temp: 80, apparent: 90, dew: 62 },
@@ -133,7 +139,8 @@ function redraw() {
 function onload() {
   var graphCanvas = document.getElementById("graph");
   var yAxisCanvas = document.getElementById("yaxis");
-  g = new SecondGriffin.WeatherGraph(graph, yaxis);
+  var keyCanvas = document.getElementById("key");
+  g = new SecondGriffin.WeatherGraph(graphCanvas, yAxisCanvas, keyCanvas);
   window.addEventListener("resize", redraw, false);
 
   setMessage("Retrieving location.");
@@ -228,6 +235,7 @@ function setMessage(text) {
 <div id="loaded" style="display: none;">
   <canvas id="yaxis" width="0" height="0"></canvas>
   <canvas id="graph" width="0" height="0"></canvas>
+  <canvas id="key" width="150" height="50"></canvas>
   <header>
     <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
   </header>

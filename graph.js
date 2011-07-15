@@ -2,6 +2,24 @@ SecondGriffin = window.SecondGriffin || { };
 
 
 (function(ns) {
+  var dewColor = "rgb(0, 153, 0)";
+  var heatColor = "rgb(184, 134, 11)";
+  var tempColor = "rgb(255, 0, 0)";
+
+  var drawLine = function(ctx, x1, y1, x2, y2, color) {
+    ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  };
+
+  var drawPoint = function(ctx, x, y) {
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, 2 * Math.PI, 0);
+    ctx.fill();
+  };
+
   var Rectangle = function(x, y, width, height) {
     this.x = x;
     this.y = y;
@@ -14,9 +32,11 @@ SecondGriffin = window.SecondGriffin || { };
     return this;
   }
 
-  var graph = function(graphCanvas, yAxisCanvas) {
+  var graph = function(graphCanvas, yAxisCanvas, keyCanvas) {
     this.graphCanvas = graphCanvas;
     this.yAxisCanvas = yAxisCanvas;
+    this.keyCanvas = keyCanvas;
+
     this.logicalMinY = 50;
     this.logicalMaxY = 100;
     this.gridWidth = 50;
@@ -46,6 +66,9 @@ SecondGriffin = window.SecondGriffin || { };
   };
   graph.prototype.getYAxisCanvas = function() {
     return this.yAxisCanvas;
+  };
+  graph.prototype.getKeyCanvas = function() {
+    return this.keyCanvas;
   };
 
   graph.prototype.setLogicalYBounds = function(min, max) {
@@ -89,6 +112,9 @@ SecondGriffin = window.SecondGriffin || { };
     var ctx = canvas.getContext("2d");
     var yAxisCanvas = this.yAxisCanvas;
     var yctx = yAxisCanvas.getContext("2d");
+    var keyCanvas = this.keyCanvas;
+    var kctx = keyCanvas.getContext("2d");
+
     this.setLogicalXBounds(0, data.length - 1);
 
     canvas.width = (data.length + 1) * this.gridWidth + this.leftSpacing + this.rightSpacing;
@@ -103,7 +129,9 @@ SecondGriffin = window.SecondGriffin || { };
 
     this.drawBackground(ctx, data, rect);
     this.drawLines(ctx, data, rect);
-    this.drawData(ctx, data, rect);
+    //this.drawData(ctx, data, rect);
+    this.drawTemperatureData(ctx, data, rect);
+    this.drawTemperatureKey(kctx, new Rectangle(0, 0, keyCanvas.width, keyCanvas.height));
     this.drawXAxis(ctx, data, rect);
     this.drawYAxis(yctx, data, rect);
   };
@@ -263,6 +291,124 @@ SecondGriffin = window.SecondGriffin || { };
     for (var y = startY; y <= this.logicalMaxY; y += 10) {
       var ty = this.translateY(y, rect);                 
       drawRightAlignedText(ctx, 25, ty + 3, y.toString());
+    }
+
+    ctx.restore();
+  };
+
+  graph.prototype.drawTemperatureData = function(ctx, data, rect) {
+    ctx.save();
+
+    var drawTextAbove = function(x, y, text, color) {
+      if (ctx.fillText && ctx.measureText) {
+        ctx.fillStyle = color;
+        var measurement = ctx.measureText(text);
+        ctx.fillText(text, x - (measurement.width / 2), y - 5);
+      }
+    };
+
+    var drawTextBelow = function(x, y, text, color) {
+      if (ctx.fillText && ctx.measureText) {
+        ctx.fillStyle = color;
+        var measurement = ctx.measureText(text);
+        ctx.fillText(text, x - (measurement.width / 2), y + 15);
+      }
+    };
+
+    // Draw lines.
+    for (var i = 1; data[i]; i++) {
+      var x1, x2, y1, y2;
+
+      // Draw dew line
+      x1 = this.translateX(i - 1, rect);
+      x2 = this.translateX(i, rect);
+      y1 = this.translateY(data[i - 1].dew, rect);
+      y2 = this.translateY(data[i].dew, rect);
+      drawLine(ctx, x1, y1, x2, y2, dewColor);
+
+      // Draw heat index line, if necessary
+      // Only draw the line if it's different from the temperature line.
+      if (data[i].apparent != data[i].temp || data[i-1].apparent != data[i-1].temp) {
+        y1 = this.translateY(data[i - 1].apparent, rect);
+        y2 = this.translateY(data[i].apparent, rect);
+        drawLine(ctx, x1, y1, x2, y2, heatColor);
+      }
+
+      // Draw temp line
+      y1 = this.translateY(data[i - 1].temp, rect);
+      y2 = this.translateY(data[i].temp, rect);
+      drawLine(ctx, x1, y1, x2, y2, tempColor);
+    }
+
+    // Draw dots and text
+    for (var i = 0; data[i]; i++) {
+      ctx.fillStyle = "black";
+      var x = this.translateX(i, rect);
+      var dewY, heatY, tempY;
+      
+      // Draw dew point, if necessary
+      if (data[i].dew != data[i].temp) {
+        dewY = this.translateY(data[i].dew, rect);
+        drawPoint(ctx, x, dewY);
+      }
+
+      // Draw heat index point, if necessary
+      if (data[i].apparent != data[i].temp) {
+        heatY = this.translateY(data[i].apparent, rect);
+        drawPoint(ctx, x, heatY);
+      }
+
+      // Draw temperature point
+      tempY = this.translateY(data[i].temp, rect);
+      drawPoint(ctx, x, tempY);
+
+      if (data[i].hour % 3 == 1) {
+        // Draw dew text, if necessary
+        if (data[i].dew != data[i].temp) {
+	  drawTextBelow(x, dewY, data[i].dew, dewColor);
+	}
+
+	if (data[i].apparent != data[i].temp) {
+	  drawTextAbove(x, heatY, data[i].apparent, heatColor);
+	}
+
+	drawTextAbove(x, tempY, data[i].temp, tempColor);
+      }
+    }
+
+    ctx.restore();
+  };
+
+  graph.prototype.drawTemperatureKey = function(ctx, rect) {
+    ctx.save();
+    ctx.clearRect(rect.x, rect.y, rect.width, rect.height);
+
+    var x1 = 5.5;
+    var x2 = x1 + 20;
+    var xText = x2 + 7;
+
+    var initialOffset = 5.5;
+    var offset = 15;
+    var keyItems = [
+      { color: tempColor, name: "Temperature" },
+      { color: heatColor, name: "Heat index" },
+      { color: dewColor, name: "Dew point" }
+    ];
+
+    var drawText = function(x, y, text, color) {
+      if (ctx.fillText && ctx.measureText) {
+        ctx.fillText(text, x, y + 3);
+      }
+    };
+
+    ctx.fillStyle = "black";
+    for (var i = 0; keyItems[i]; i++) {
+      var y = initialOffset + i * offset;
+      ctx.strokeStyle = keyItems[i].color;
+      drawLine(ctx, x1, y, x2, y);
+      drawPoint(ctx, x1, y);
+      drawPoint(ctx, x2, y);
+      drawText(xText, y, keyItems[i].name);
     }
 
     ctx.restore();
