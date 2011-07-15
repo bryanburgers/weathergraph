@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<widget
+    xmlns="http://www.w3.org/ns/widgets"
+    id="com.secondgriffin.WeatherGraph"
+    version="1.0.1">
+
+  <name short="Weather Graph">Weather Graph</name>
+  <description>An app for viewing weather.gov graph data on a mobile device.</description>
+  <author email="secondgriffin@gmail.com">Second Griffin Software</author>  
+  <content src="index.html"/>
+  <feature name="http://api.phonegap.com/1.0/network"/>
+  <feature name="http://api.phonegap.com/1.0/geolocation"/>
+</widget>

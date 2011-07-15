@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Graph</title>
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=0;" />
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+
+#yaxis {
+  float: left;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+#message {
+  padding: 1em;
+  text-align: center;
+}
+
+</style>
+
+<script src="weatherParser.js"></script>
+<script src="graph.js"></script>
+<script>
+
+var g = null;
+var data = null;
+
+/*
+var data = [
+{ day: "2011-07-13", hour:  7, temp: 70, apparent: 72, dew: 59 },
+{ day: "2011-07-13", hour:  8, temp: 70, apparent: 71, dew: 57 },
+{ day: "2011-07-13", hour:  9, temp: 71, apparent: 72, dew: 59 },
+{ day: "2011-07-13", hour: 10, temp: 72, apparent: 78, dew: 60 },
+{ day: "2011-07-13", hour: 11, temp: 77, apparent: 81, dew: 61 },
+{ day: "2011-07-13", hour: 12, temp: 79, apparent: 88, dew: 59 },
+{ day: "2011-07-13", hour: 13, temp: 82, apparent: 89, dew: 62 },
+{ day: "2011-07-13", hour: 14, temp: 80, apparent: 90, dew: 62 },
+{ day: "2011-07-13", hour: 15, temp: 81, apparent: 91, dew: 63 },
+{ day: "2011-07-13", hour: 16, temp: 83, apparent: 92, dew: 65 },
+{ day: "2011-07-13", hour: 17, temp: 81, apparent: 89, dew: 65 },
+{ day: "2011-07-13", hour: 18, temp: 79, apparent: 88, dew: 68 },
+{ day: "2011-07-13", hour: 19, temp: 78, apparent: 85, dew: 69 },
+{ day: "2011-07-13", hour: 20, temp: 76, apparent: 81, dew: 71 },
+{ day: "2011-07-13", hour: 21, temp: 72, apparent: 80, dew: 70 },
+{ day: "2011-07-13", hour: 22, temp: 70, apparent: 72, dew: 59 },
+{ day: "2011-07-13", hour: 23, temp: 70, apparent: 71, dew: 57 },
+{ day: "2011-07-14", hour:  0, temp: 71, apparent: 72, dew: 59 },
+{ day: "2011-07-14", hour:  1, temp: 72, apparent: 78, dew: 60 },
+{ day: "2011-07-14", hour:  2, temp: 77, apparent: 81, dew: 61 },
+{ day: "2011-07-14", hour:  3, temp: 79, apparent: 88, dew: 59 },
+{ day: "2011-07-14", hour:  4, temp: 82, apparent: 89, dew: 62 },
+{ day: "2011-07-14", hour:  5, temp: 80, apparent: 90, dew: 62 },
+{ day: "2011-07-14", hour:  6, temp: 81, apparent: 91, dew: 63 },
+{ day: "2011-07-14", hour:  7, temp: 83, apparent: 92, dew: 65 },
+{ day: "2011-07-14", hour:  8, temp: 81, apparent: 89, dew: 65 },
+{ day: "2011-07-14", hour:  9, temp: 79, apparent: 88, dew: 68 },
+{ day: "2011-07-14", hour: 10, temp: 78, apparent: 85, dew: 69 },
+{ day: "2011-07-14", hour: 11, temp: 76, apparent: 81, dew: 71 },
+{ day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70 },
+];
+*/
+
+function redraw() {
+  if (!data) return;
+  g.getGraphCanvas().width = data.length * 40;
+  g.getGraphCanvas().height = Math.min(window.innerHeight - 5, 200);
+  g.getYAxisCanvas().width = 30;
+  g.getYAxisCanvas().height = Math.min(window.innerHeight - 5, 200);
+  g.setLogicalXBounds(0, data.length - 1);
+
+  if (data.length > 0) {
+    var minY = 1000;
+    var maxY = -200;
+    for (var i = 0; data[i]; i++) {
+      var temp = data[i].temp;
+      var apparent = data[i].apparent;
+      var dew = data[i].dew;
+
+      var max = Math.max(temp, apparent, dew);
+      var min = Math.min(temp, apparent, dew);
+      var logMax = Math.ceil((max + 0.5) / 10) * 10;
+      var logMin = Math.floor((min - 0.5) / 10) * 10;
+      minY = Math.min(minY, logMin);
+      maxY = Math.max(maxY, logMax);
+    }
+
+    g.setLogicalYBounds(minY, maxY);
+  }
+
+
+  g.redraw(data);
+}
+
+
+
+function onload() {
+  var graphCanvas = document.getElementById("graph");
+  var yAxisCanvas = document.getElementById("yaxis");
+  g = new SecondGriffin.WeatherGraph(graph, yaxis);
+  window.addEventListener("resize", redraw, false);
+  //redraw();
+
+  setMessage("Retrieving location.");
+
+  if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
+    navigator.geolocation.getCurrentPosition(
+      function (success) { loadData(success.coords); },
+      function (failure) { setMessage("Failed to retrieve location."); }
+    );
+  }
+}
+
+function loadData(position) {
+  setMessage("Loading weather data.");
+  var url = "http://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=hi&w3u=1&AheadHour=0&FcstType=digital&textField1=" + position.latitude + "&textField2=" + position.longitude;
+  var xhr = new XMLHttpRequest();  
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4) {
+      if (xhr.status == 200) {
+        data = new SecondGriffin.WeatherParser().parse(xhr.responseText);
+        setMessage(null);
+        redraw();
+      }
+      else {
+        setMessage("Failed to get weather data.");
+      }
+    }
+    console.log(xhr);
+  };
+  xhr.open("GET", url, true);
+  xhr.send(null);
+}
+
+function setMessage(text) {
+  var message = document.getElementById("message");
+  if (!message) return;
+  
+  if (!!text) {
+    message.innerText = text;
+    message.style.display = "block";
+  }
+  else {
+    message.innerText = "";
+    message.style.display = "none";
+  }
+}
+
+
+</script>
+</head>
+<body onload="onload()">
+<canvas id="yaxis" width="0" height="0"></canvas>
+<canvas id="graph" width="0" height="0"></canvas>
+<div id="message">Loading.</div>
+</body>
+</html>
