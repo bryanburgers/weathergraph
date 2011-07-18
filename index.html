@@ -70,10 +70,11 @@ header h1 {
 <script>
 
 var g = null;
-var data = null;
+var data = [];
 var mode = SecondGriffin.WeatherGraph.TEMPERATURE;
+var position = null;
+var hoursAhead = 0;
 
-/*
 data = [
 { day: "2011-07-13", hour:  7, temp: 70, apparent: 72, dew: 59, wind: 3, windDirection: "N", gust: null },
 { day: "2011-07-13", hour:  8, temp: 70, apparent: 71, dew: 57, wind: 4, windDirection: "NNE", gust: null },
@@ -106,10 +107,9 @@ data = [
 { day: "2011-07-14", hour: 11, temp: 76, apparent: 81, dew: 71, wind: 10, windDirection: "N", gust: null },
 { day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70, wind: 10, windDirection: "N", gust: null },
 ];
-*/
 
 function redraw() {
-  if (!data) return;
+  if (!data || data.length == 0) return;
   g.getYAxisCanvas().width = 30;
   g.setGridWidth(30);
   g.setMaximumGridHeight(30);
@@ -140,7 +140,13 @@ function onload() {
 
   if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
     navigator.geolocation.getCurrentPosition(
-      function (success) { loadData(success.coords); loadLocationName(success.coords); },
+      function (success) {
+        data = []; // Clear old data
+        position = success.coords; // Set the current position
+	hoursAhead = 0; // Set the hours ahead to load
+        loadData(); // Load the data
+        loadLocationName(position); // Find the name of the location
+      },
       function (failure) { setMessage("Failed to retrieve location."); }
     );
   }
@@ -160,16 +166,16 @@ function loadLocationName(position) {
         if (found) break;
 
         var result = results[i];
-	console.log(result);
+        console.log(result);
 
         for (var j = 0; result.types[j]; j++) {
-	  if (found) break;
+          if (found) break;
 
-	  if (result.types[j] == "political") {
-	    location = result.formatted_address;
-	    found = true;
-	  }
-	}
+          if (result.types[j] == "political") {
+            location = result.formatted_address;
+            found = true;
+          }
+        }
       }
 
       if (!found) {
@@ -187,16 +193,20 @@ function loadLocationName(position) {
   });
 }
 
-function loadData(position) {
+function loadData() {
   setMessage("Loading weather data.");
-  var url = "http://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=hi&w3=sfcwind&w3u=1&AheadHour=0&FcstType=digital&textField1=" + position.latitude + "&textField2=" + position.longitude;
+  var url = "http://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=hi&w3=sfcwind&w3u=1&AheadHour=" + hoursAhead + "&FcstType=digital&textField1=" + position.latitude + "&textField2=" + position.longitude;
   var xhr = new XMLHttpRequest();  
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
       if (xhr.status == 200) {
-        data = new SecondGriffin.WeatherParser().parse(xhr.responseText);
+        var newData = new SecondGriffin.WeatherParser().parse(xhr.responseText);
+        data = data.concat(newData);
+	hoursAhead += newData.length;
         setMessage(null);
         redraw();
+	// Allow for loading more data when we scroll far enough.
+        window.addEventListener("scroll", scroll, false);
       }
       else {
         setMessage("Failed to get weather data.");
@@ -232,6 +242,16 @@ function selectWind() {
   mode = SecondGriffin.WeatherGraph.WIND;
   redraw();
   return false;
+}
+
+function scroll(e) {
+  var rightEdge = window.pageXOffset + window.innerWidth;
+  if (rightEdge > document.getElementById("graph").width - 40) {
+    window.removeEventListener("scroll", scroll, false);
+    if (position != null && hoursAhead <= 96) { // Weather.gov accepts a query for 96, but nothing after that.
+      loadData();
+    }
+  }
 }
 
 </script>
