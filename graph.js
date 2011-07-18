@@ -174,16 +174,19 @@ SecondGriffin = window.SecondGriffin || { };
     this.drawLines(ctx, data, graphSettings);
     this.drawXAxis(ctx, data, graphSettings);
 
+    var yAxisSuffix = '';
+
     if (!mode || mode == graph.TEMPERATURE) {
       this.drawTemperatureData(ctx, data, graphSettings);
       this.drawTemperatureKey(kctx, keyRect);
+      yAxisSuffix = '\u00b0';
     }
     else if (mode == graph.WIND) {
       this.drawWindData(ctx, data, graphSettings);
       this.drawWindKey(kctx, keyRect);
     }
 
-    this.drawYAxis(yctx, data, graphSettings);
+    this.drawYAxis(yctx, data, graphSettings, yAxisSuffix);
   };
 
   graph.prototype.drawBackground = function(ctx, data, graphSettings) {
@@ -325,7 +328,7 @@ SecondGriffin = window.SecondGriffin || { };
     ctx.restore();
   };
 
-  graph.prototype.drawYAxis = function(ctx, data, graphSettings) {
+  graph.prototype.drawYAxis = function(ctx, data, graphSettings, suffix) {
     var drawRightAlignedText = function(ctx, tx, ty, text) {
       if (ctx.fillText && ctx.measureText) {
         var measurement = ctx.measureText(text);
@@ -343,7 +346,7 @@ SecondGriffin = window.SecondGriffin || { };
     var startY = Math.floor(graphSettings.bounds.y.min / 10) * 10;
     for (var y = startY; y <= graphSettings.bounds.y.max; y += graphSettings.bounds.y.by) {
       var ty = graphSettings.translateY(y);                 
-      drawRightAlignedText(ctx, 25, ty + 3, y.toString());
+      drawRightAlignedText(ctx, 25, ty + 3, y.toString() + suffix);
     }
 
     ctx.restore();
@@ -428,16 +431,16 @@ SecondGriffin = window.SecondGriffin || { };
         // Draw dew text, if necessary
         if (data[i].dew != data[i].temp) {
 	  ctx.fillStyle = dewColor;
-	  drawTextBelow(ctx, x, dewY, data[i].dew);
+	  drawTextBelow(ctx, x, dewY, data[i].dew.toString() + '\u00b0');
 	}
 
 	if (data[i].apparent != data[i].temp) {
 	  ctx.fillStyle = heatColor;
-	  drawTextAbove(ctx, x, heatY, data[i].apparent);
+	  drawTextAbove(ctx, x, heatY, data[i].apparent.toString() + '\u00b0');
 	}
 
         ctx.fillStyle = tempColor;
-	drawTextAbove(ctx, x, tempY, data[i].temp);
+	drawTextAbove(ctx, x, tempY, data[i].temp.toString() + '\u00b0');
       }
     }
 
