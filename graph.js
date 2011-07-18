@@ -10,7 +10,7 @@ SecondGriffin = window.SecondGriffin || { };
   var windVeinColor = "rgb(102, 102, 102)";
 
   var convertToKnots = function(i) {
-    return i * 1.25;
+    return i * 0.868976242;
   };
 
   var drawLine = function(ctx, x1, y1, x2, y2, color) {
@@ -475,7 +475,7 @@ SecondGriffin = window.SecondGriffin || { };
     ctx.save();
 
     var drawWindVein = function(ctx, x, y, wind, direction) {
-      var knots = wind;
+      var knots = convertToKnots(wind);
 
       ctx.save();
       var rotation = 5;
@@ -543,33 +543,33 @@ SecondGriffin = window.SecondGriffin || { };
       if (knots > 0) {
         if (knots <= 5) {
 	  ctx.moveTo(x, y - 20);
-	  ctx.lineTo(x - 4, y - 20);
+	  ctx.lineTo(x + 4, y - 20);
 	}
 	else {
 	  ctx.moveTo(x, y - 20);
-	  ctx.lineTo(x - 8, y - 20);
+	  ctx.lineTo(x + 8, y - 20);
 	}
       }
 
       if (knots > 10) {
         if (knots <= 15) {
 	  ctx.moveTo(x, y - 18);
-	  ctx.lineTo(x - 4, y - 18);
+	  ctx.lineTo(x + 4, y - 18);
 	}
 	else {
 	  ctx.moveTo(x, y - 18);
-	  ctx.lineTo(x - 8, y - 18);
+	  ctx.lineTo(x + 8, y - 18);
 	}
       }
 
       if (knots > 20) {
         if (knots <= 25) {
 	  ctx.moveTo(x, y - 16);
-	  ctx.lineTo(x - 4, y - 16);
+	  ctx.lineTo(x + 4, y - 16);
 	}
 	else {
 	  ctx.moveTo(x, y - 16);
-	  ctx.lineTo(x - 8, y - 16);
+	  ctx.lineTo(x + 8, y - 16);
 	}
       }
 
