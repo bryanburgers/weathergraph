@@ -137,6 +137,13 @@ function onload() {
   g = new SecondGriffin.WeatherGraph(graphCanvas, yAxisCanvas, keyCanvas);
   window.addEventListener("resize", redraw, false);
 
+  var tempSelect = document.getElementById("temperatureSelect");
+  var windSelect = document.getElementById("windSelect");
+  tempSelect.addEventListener("click", selectTemperature, false);
+  windSelect.addEventListener("click", selectWind, false);
+  tempSelect.addEventListener("touchstart", selectTemperatureTouch, false);
+  windSelect.addEventListener("touchstart", selectWindTouch, false);
+
   setMessage("Retrieving location.");
 
   if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
@@ -233,16 +240,26 @@ function setMessage(text) {
   }
 }
 
-function selectTemperature() {
-  mode = SecondGriffin.WeatherGraph.TEMPERATURE;
-  redraw();
-  return false;
+function selectTemperatureTouch(e) {
+  document.getElementById("temperatureSelect").removeEventListener("click", selectTemperature, false);
+  selectTemperature(e);
 }
 
-function selectWind() {
+function selectTemperature(e) {
+  mode = SecondGriffin.WeatherGraph.TEMPERATURE;
+  redraw();
+  e.preventDefault();
+}
+
+function selectWindTouch(e) {
+  document.getElementById("windSelect").removeEventListener("click", selectWind, false);
+  selectTemperature(e);
+}
+
+function selectWind(e) {
   mode = SecondGriffin.WeatherGraph.WIND;
   redraw();
-  return false;
+  e.preventDefault();
 }
 
 function scroll(e) {
@@ -266,8 +283,8 @@ function scroll(e) {
     <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
   </header>
   <div class="selection">
-    <a href="#" onclick="return selectTemperature();">Temperature</a>
-    <a href="#" onclick="return selectWind();">Wind</a>
+    <a href="#" id="temperatureSelect">Temperature</a>
+    <a href="#" id="windSelect">Wind</a>
   </div>
 </div>
 <div id="loading">
