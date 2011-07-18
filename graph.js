@@ -172,6 +172,7 @@ SecondGriffin = window.SecondGriffin || { };
 
     this.drawBackground(ctx, data, graphSettings);
     this.drawLines(ctx, data, graphSettings);
+    this.drawXAxis(ctx, data, graphSettings);
 
     if (!mode || mode == graph.TEMPERATURE) {
       this.drawTemperatureData(ctx, data, graphSettings);
@@ -182,7 +183,6 @@ SecondGriffin = window.SecondGriffin || { };
       this.drawWindKey(kctx, keyRect);
     }
 
-    this.drawXAxis(ctx, data, graphSettings);
     this.drawYAxis(yctx, data, graphSettings);
   };
 
