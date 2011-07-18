@@ -57,10 +57,16 @@ header h1 {
 
 .selection {
   position: fixed;
-  padding: 0 0.75em;
+  bottom: 0;
+  padding: 1em 0.75em;
 }
 .selection a {
   margin: 0 0.25em;
+  text-decoration: none;
+  color: black;
+}
+.selection a:hover {
+  text-decoration: underline;
 }
 
 </style>
@@ -255,7 +261,7 @@ function selectTemperature(e) {
 
 function selectWindTouch(e) {
   document.getElementById("windSelect").removeEventListener("click", selectWind, false);
-  selectTemperature(e);
+  selectWind(e);
 }
 
 function selectWind(e) {
@@ -285,7 +291,7 @@ function scroll(e) {
     <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
   </header>
   <div class="selection">
-    <a href="#" id="temperatureSelect">Temperature</a>
+    <a href="#" id="temperatureSelect">Temperature</a> |
     <a href="#" id="windSelect">Wind</a>
   </div>
 </div>
