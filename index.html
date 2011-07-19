@@ -69,6 +69,28 @@ header h1 {
   text-decoration: underline;
 }
 
+
+#menu {
+  display: none;
+  position: fixed;
+  top: 5;
+  bottom: 5;
+  left: 5;
+  right: 5;
+  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  border-radius: 1em;
+}
+#menu ul a {
+  display: block;
+  padding: 0.5em;
+}
+#menu a strong {
+}
+#menu a span {
+  font-size: 0.8em;
+}
+
 </style>
 
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
@@ -166,6 +188,34 @@ function onload() {
       function (failure) { setMessage("Failed to retrieve location."); }
     );
   }
+  
+  // Event handler for when PhoneGap is ready
+  document.addEventListener('deviceready', onDeviceReady, false);
+
+  // Set up the event handlers for the buttons on the menu.
+  var menu = document.getElementById('menu');
+
+  var makeHandler = function(el, menu) {
+    el.addEventListener('click', function (e) {
+      mode = parseInt(el.getAttribute('data-mode'));
+      menu.style.display = 'none';
+    }, false);
+  };
+  
+  var buttons = menu.getElementsByTagName("a");
+  for (var i = 0; buttons[i]; i++) {
+    makeHandler(buttons[i], menu);
+  }
+}
+
+function onDeviceReady(e) {
+  // Event handler for the menu button
+  document.addEventListener('menubutton', onMenuButton, false);
+}
+
+function onMenuButton(e) {
+  var menu = document.getElementById('menu');
+  menu.style.display = 'block';
 }
 
 function loadLocationName(position) {
@@ -297,6 +347,22 @@ function scroll(e) {
 </div>
 <div id="loading">
   <div id="message">Loading.</div>
+</div>
+<div id="menu">
+  <ul>
+    <li>
+      <a href="#" id="menuTemperatureSelect" data-mode="1">
+        <strong>Temperature</strong>
+        <span>Temperature, heat index, and dew point</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" id="menuWindSelect" data-mode="2">
+        <strong>Wind</strong>
+        <span>Wind speed, wind direction, and gusts</span>
+      </a>
+    </li>
+  </ul>
 </div>
 </body>
 </html>
