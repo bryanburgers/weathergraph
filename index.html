@@ -73,14 +73,24 @@ header h1 {
 #menu {
   display: none;
   position: fixed;
-  top: 5;
-  bottom: 5;
+  top: 10;
+  bottom: 10;
   left: 5;
   right: 5;
   -webkit-box-shadow: 0 2px 8px rgba(0,0,0,0.75);
   box-shadow: 0 2px 8px rgba(0,0,0,0.75);
   border-radius: 1em;
   background-color: white;
+}
+#menu ul {
+  list-style-type: none;
+}
+#menu li {
+  border-top: 1px solid rgb(200, 200, 200);
+  border-bottom: 1px solid rgb(200, 200, 200);
+}
+#menu li:first {
+  border-top: none;
 }
 #menu ul a {
   display: block;
@@ -203,13 +213,16 @@ function onload() {
 
   var makeHandler = function(el, menu) {
     el.addEventListener('click', function (e) {
+      alert('click');
       mode = parseInt(el.getAttribute('data-mode'));
+      redraw();
       menu.style.display = 'none';
+      e.preventDefault();
     }, false);
   };
   
   var buttons = menu.getElementsByTagName("a");
-  for (var i = 0; buttons[i]; i++) {
+  for (var i = 0; i < buttons.length; i++) {
     makeHandler(buttons[i], menu);
   }
 }
@@ -357,13 +370,13 @@ function scroll(e) {
 <div id="menu">
   <ul>
     <li>
-      <a href="#" id="menuTemperatureSelect" data-mode="1">
+      <a href="#" id="menuTemperatureSelect" data-command="mode" data-mode="1">
         <strong>Temperature</strong>
         <span>Temperature, heat index, and dew point</span>
       </a>
     </li>
     <li>
-      <a href="#" id="menuWindSelect" data-mode="2">
+      <a href="#" id="menuWindSelect" data-command="mode" data-mode="2">
         <strong>Wind</strong>
         <span>Wind speed, wind direction, and gusts</span>
       </a>
