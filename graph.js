@@ -323,10 +323,13 @@ SecondGriffin = window.SecondGriffin || { };
       if (data[i].hour == 0 || i == 0) {
         var tx = graphSettings.translateX(i);
         var ty = graphSettings.graphArea.bottom + 22;
-	if (data[i].hour < 20) {
-	  // Only draw the date if it isn't going to overlap the next date.
+
+        if (data[i].hour < 20 && i < data.length - 4) {
+          // Only draw the date if it isn't going to overlap the next date (data[i].hour < 20)
+          // and as long as we aren't going to run into the end
+          // of the graph (i < data.length - 4)
           drawLeftAlignedText(ctx, tx + 3, ty, data[i].day);
-	}
+        }
 
         ctx.save();
         ctx.strokeStyle = this.outlineColor;
@@ -338,10 +341,14 @@ SecondGriffin = window.SecondGriffin || { };
       }
       else if (data[i].hour == 12 && i > 5) {
         // Draw the date again at noon, as long as we didn't
-	// just draw the date initially.
-        var tx = graphSettings.translateX(i);
-        var ty = graphSettings.graphArea.bottom + 22;
-        drawLeftAlignedText(ctx, tx + 3, ty, data[i].day);
+        // just draw the date initially, (i > 4)
+        // and as long as we aren't going to run into the end
+        // of the graph (i < data.length - 4)
+        if (i > 4 && i < data.length - 4) {
+          var tx = graphSettings.translateX(i);
+          var ty = graphSettings.graphArea.bottom + 22;
+          drawLeftAlignedText(ctx, tx + 3, ty, data[i].day);
+        }
       }
     }
 
