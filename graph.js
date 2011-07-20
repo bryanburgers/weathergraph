@@ -196,6 +196,16 @@ SecondGriffin = window.SecondGriffin || { };
     var gradient = ctx.createLinearGradient(0, 0, 0, rect.height);
     ctx.fillStyle = this.dayBackground;
     ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    ctx.beginPath();
+
+    // Clip the rectangle, so when we fill the dark for the background
+    // it doesn't overflow.
+    ctx.moveTo(rect.left, rect.top);
+    ctx.lineTo(rect.right, rect.top);
+    ctx.lineTo(rect.right, rect.bottom);
+    ctx.lineTo(rect.left, rect.bottom);
+    ctx.closePath();
+    ctx.clip();
 
     var fillBackground = function(i) {
       var xStart = graphSettings.translateX(i - 0.5, rect);
