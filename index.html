@@ -72,20 +72,26 @@ header h1 {
 
 #menu {
   position: fixed;
-  top: 10;
-  bottom: 10;
-  left: 5;
-  right: 5;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  padding: 1em 0;
+
   -webkit-box-shadow: 0 2px 8px rgba(0,0,0,0.75);
   box-shadow: 0 2px 8px rgba(0,0,0,0.75);
   border-radius: 1em;
   background-color: rgb(240,240,240);
   z-index: 1;
 }
+#menu h1 {
+  padding: 0.5em;
+  padding-top: 0;
+  font-size: 1em;
+  font-weight: bold;
+}
 #menu ul {
   list-style-type: none;
   background-color: white;
-  margin: 1em 0;
   border-bottom: 1px solid rgb(200, 200, 200);
 }
 #menu li {
@@ -207,14 +213,20 @@ function onload() {
   // Event handler for when PhoneGap is ready
   document.addEventListener('deviceready', onDeviceReady, false);
 
+  // Initialize the menu options
+  var menu = document.getElementById('menu');
+  var buttons = menu.getElementsByTagName("a");
+  for (var i = 0; i < buttons.length; i++) {
+    initializeMenuOption(buttons[i], menu);
+  }
 }
 
 function initializeMenuOption(el, menu) {
   el.addEventListener('touchstart', function(e) {
-    menu.style.display = 'none';
-    document.removeEventListener('backbutton', onBackButton, false);
     mode = parseInt(el.getAttribute('data-mode'));
     redraw();
+    menu.style.display = 'none';
+    document.removeEventListener('backbutton', onBackButton, false);
   }, false);
 }
 
@@ -235,10 +247,6 @@ function onMenuButton(e) {
     menu.style.display = 'block';
     document.addEventListener('backbutton', onBackButton, false);
 
-    var buttons = menu.getElementsByTagName("a");
-    for (var i = 0; i < buttons.length; i++) {
-      initializeMenuOption(buttons[i], menu);
-    }
   }
 }
 
@@ -370,6 +378,7 @@ function scroll(e) {
 </head>
 <body onload="onload()">
 <div id="menu" style="display: none;">
+  <h1>Menu</h1>
   <ul>
     <li>
       <a href="#" id="menuTemperatureSelect" data-command="mode" data-mode="1">
