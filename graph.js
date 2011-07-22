@@ -323,7 +323,13 @@ SecondGriffin = window.SecondGriffin || { };
       if (data[i].hour == 0 || i == 0) {
         var tx = graphSettings.translateX(i);
         var ty = graphSettings.graphArea.bottom + 22;
-        drawLeftAlignedText(ctx, tx + 3, ty, data[i].day);
+
+        if (data[i].hour < 20 && i < data.length - 4) {
+          // Only draw the date if it isn't going to overlap the next date (data[i].hour < 20)
+          // and as long as we aren't going to run into the end
+          // of the graph (i < data.length - 4)
+          drawLeftAlignedText(ctx, tx + 3, ty, data[i].day);
+        }
 
         ctx.save();
         ctx.strokeStyle = this.outlineColor;
@@ -332,6 +338,17 @@ SecondGriffin = window.SecondGriffin || { };
         ctx.lineTo(tx, ty + 5);
         ctx.stroke();
         ctx.restore();
+      }
+      else if (data[i].hour == 12 && i > 5) {
+        // Draw the date again at noon, as long as we didn't
+        // just draw the date initially, (i > 4)
+        // and as long as we aren't going to run into the end
+        // of the graph (i < data.length - 4)
+        if (i > 4 && i < data.length - 4) {
+          var tx = graphSettings.translateX(i);
+          var ty = graphSettings.graphArea.bottom + 22;
+          drawLeftAlignedText(ctx, tx + 3, ty, data[i].day);
+        }
       }
     }
 
@@ -374,7 +391,7 @@ SecondGriffin = window.SecondGriffin || { };
         var max = Math.max(temp, apparent, dew);
         var min = Math.min(temp, apparent, dew);
         var logMax = Math.ceil((max + 0.5) / 10) * 10;
-        var logMin = Math.floor((min - 0.5) / 10) * 10;
+        var logMin = Math.floor((min - 5.5) / 10) * 10;
         minY = Math.min(minY, logMin);
         maxY = Math.max(maxY, logMax);
       }
@@ -387,8 +404,19 @@ SecondGriffin = window.SecondGriffin || { };
     }
   };
 
+  graph.prototype.setDefaultGraphSettings = function(ctx) {
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = "rgba(0,0,0,0.3)";
+    ctx.shadowBlur = 3;
+    // For some reason, the shadow is opposite on Android.
+    ctx.shadowOffsetY = -2;
+    ctx.shadowOffsetX = 0;
+  };
+
   graph.prototype.drawTemperatureData = function(ctx, data, graphSettings) {
     ctx.save();
+
+    this.setDefaultGraphSettings(ctx);
 
     // Draw lines.
     for (var i = 1; data[i]; i++) {
@@ -467,7 +495,7 @@ SecondGriffin = window.SecondGriffin || { };
   };
 
   graph.prototype.getWindLogicalYBounds = function(data, rect) {
-    var maxY = 10;
+    var maxY = 40;
     for (var i = 0; data[i]; i++) {
       var wind = data[i].wind;
       var gust = data[i].gust || 0;
@@ -486,6 +514,8 @@ SecondGriffin = window.SecondGriffin || { };
 
   graph.prototype.drawWindData = function(ctx, data, graphSettings) {
     ctx.save();
+
+    this.setDefaultGraphSettings(ctx);
 
     var drawWindVein = function(ctx, x, y, wind, direction) {
       var knots = convertToKnots(wind);
@@ -678,9 +708,12 @@ SecondGriffin = window.SecondGriffin || { };
     for (var i = 0; keyItems[i]; i++) {
       var y = initialOffset + i * offset;
       ctx.strokeStyle = keyItems[i].color;
+      ctx.save();
+      this.setDefaultGraphSettings(ctx);
       drawLine(ctx, x1, y, x2, y);
       drawPoint(ctx, x1, y);
       drawPoint(ctx, x2, y);
+      ctx.restore();
       drawText(xText, y, keyItems[i].name);
     }
 
