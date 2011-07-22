@@ -80,6 +80,7 @@ header h1 {
   box-shadow: 0 2px 8px rgba(0,0,0,0.75);
   border-radius: 1em;
   background-color: rgb(240,240,240);
+  z-index: 1;
 }
 #menu ul {
   list-style-type: none;
@@ -368,21 +369,6 @@ function scroll(e) {
 </script>
 </head>
 <body onload="onload()">
-<div id="loaded" style="display: none;">
-  <canvas id="yaxis" width="0" height="0"></canvas>
-  <canvas id="graph" width="0" height="0"></canvas>
-  <canvas id="key" width="150" height="50"></canvas>
-  <header>
-    <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
-  </header>
-  <div class="selection">
-    <a href="#" id="temperatureSelect">Temperature</a> |
-    <a href="#" id="windSelect">Wind</a>
-  </div>
-</div>
-<div id="loading">
-  <div id="message">Loading.</div>
-</div>
 <div id="menu" style="display: none;">
   <ul>
     <li>
@@ -398,6 +384,21 @@ function scroll(e) {
       </a>
     </li>
   </ul>
+</div>
+<div id="loaded" style="display: none;">
+  <canvas id="yaxis" width="0" height="0"></canvas>
+  <canvas id="graph" width="0" height="0"></canvas>
+  <canvas id="key" width="150" height="50"></canvas>
+  <header>
+    <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
+  </header>
+  <div class="selection">
+    <a href="#" id="temperatureSelect">Temperature</a> |
+    <a href="#" id="windSelect">Wind</a>
+  </div>
+</div>
+<div id="loading">
+  <div id="message">Loading.</div>
 </div>
 </body>
 </html>
