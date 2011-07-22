@@ -495,7 +495,7 @@ SecondGriffin = window.SecondGriffin || { };
   };
 
   graph.prototype.getWindLogicalYBounds = function(data, rect) {
-    var maxY = 10;
+    var maxY = 40;
     for (var i = 0; data[i]; i++) {
       var wind = data[i].wind;
       var gust = data[i].gust || 0;
