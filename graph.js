@@ -407,6 +407,12 @@ SecondGriffin = window.SecondGriffin || { };
   graph.prototype.drawTemperatureData = function(ctx, data, graphSettings) {
     ctx.save();
 
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = "rgba(0,0,0,0.3)";
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 2;
+    ctx.shadowOffsetX = 0;
+
     // Draw lines.
     for (var i = 1; data[i]; i++) {
       var x1, x2, y1, y2;
