@@ -198,11 +198,18 @@ function loadLocationName(position) {
         location = result[0].formatted_address;
       }
 
+      try {
+      location = location.toString();
+
       // If our string ends with ", USA", we want to remove it.
-      //if (location.lastIndexOf(", USA") + 5 == location.length) {
-      //  location = location.substring(0, s.lastIndexOf(", USA"));
-      //}
+      if (location.lastIndexOf(", USA") + 5 == location.length) {
+        location = location.substring(0, s.lastIndexOf(", USA"));
+      }
       //location.replace(", USA", "");
+      }
+      catch (ex) {
+        alert(ex);
+      }
 
       document.getElementById("location").innerText = location;
     }
