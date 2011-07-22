@@ -55,22 +55,50 @@ header h1 {
   font-style: italic;
 }
 
-.selection {
+#menu {
   position: fixed;
-  bottom: 0;
-  padding: 1em 0.75em;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  padding: 1em 0;
+
+  -webkit-box-shadow: 0 2px 8px rgba(0,0,0,0.75);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.75);
+  border-radius: 1em;
+  background-color: rgb(240,240,240);
+  z-index: 1;
 }
-.selection a {
-  margin: 0 0.25em;
-  text-decoration: none;
+#menu h1 {
+  padding: 0.5em;
+  padding-top: 0;
+  font-size: 1em;
+  font-weight: bold;
+}
+#menu ul {
+  list-style-type: none;
+  background-color: white;
+  border-bottom: 1px solid rgb(200, 200, 200);
+}
+#menu li {
+  border-top: 1px solid rgb(200, 200, 200);
+}
+#menu ul a {
+  display: block;
+  padding: 0.5em;
   color: black;
+  text-decoration: none;
 }
-.selection a:hover {
-  text-decoration: underline;
+#menu a strong {
+  display: block;
+}
+#menu a span {
+  display: block;
+  font-size: 0.8em;
 }
 
 </style>
 
+<script src="phonegap.js"></script>
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
 <script src="weatherParser.js"></script>
 <script src="graph.js"></script>
@@ -145,13 +173,6 @@ function onload() {
   g = new SecondGriffin.WeatherGraph(graphCanvas, yAxisCanvas, keyCanvas);
   window.addEventListener("resize", redraw, false);
 
-  var tempSelect = document.getElementById("temperatureSelect");
-  var windSelect = document.getElementById("windSelect");
-  tempSelect.addEventListener("click", selectTemperature, false);
-  windSelect.addEventListener("click", selectWind, false);
-  tempSelect.addEventListener("touchstart", selectTemperatureTouch, false);
-  windSelect.addEventListener("touchstart", selectWindTouch, false);
-
   setMessage("Retrieving location.");
 
   if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
@@ -165,6 +186,56 @@ function onload() {
       },
       function (failure) { setMessage("Failed to retrieve location."); }
     );
+  }
+  
+  // Event handler for when PhoneGap is ready
+  document.addEventListener('deviceready', onDeviceReady, false);
+
+  // Initialize the menu options
+  var menu = document.getElementById('menu');
+  var buttons = menu.getElementsByTagName("a");
+  for (var i = 0; i < buttons.length; i++) {
+    initializeMenuOption(buttons[i], menu);
+  }
+}
+
+function initializeMenuOption(el, menu) {
+  el.addEventListener('touchstart', function(e) {
+    mode = parseInt(el.getAttribute('data-mode'));
+    redraw();
+    menu.style.display = 'none';
+    document.removeEventListener('backbutton', onBackButton, false);
+  }, false);
+}
+
+function onDeviceReady(e) {
+  // Event handler for the menu button
+  document.addEventListener('menubutton', onMenuButton, false);
+}
+
+function onMenuButton(e) {
+  var menu = document.getElementById('menu');
+  if (menu.style.display == 'block')
+  {
+    menu.style.display = 'none';
+    document.removeEventListener('backbutton', onBackButton, false);
+  }
+  else
+  {
+    menu.style.display = 'block';
+    document.addEventListener('backbutton', onBackButton, false);
+
+  }
+}
+
+function onBackButton(e) {
+  // If the menu is showing, hide it. Otherwise, ignore this button.
+  var menu = document.getElementById('menu');
+  if (menu.style.display == 'block')
+  {
+    menu.style.display = 'none';
+    document.removeEventListener('backbutton', onBackButton, false);
+    e.preventDefault();
   }
 }
 
@@ -249,28 +320,6 @@ function setMessage(text) {
   }
 }
 
-function selectTemperatureTouch(e) {
-  document.getElementById("temperatureSelect").removeEventListener("click", selectTemperature, false);
-  selectTemperature(e);
-}
-
-function selectTemperature(e) {
-  mode = SecondGriffin.WeatherGraph.TEMPERATURE;
-  redraw();
-  e.preventDefault();
-}
-
-function selectWindTouch(e) {
-  document.getElementById("windSelect").removeEventListener("click", selectWind, false);
-  selectWind(e);
-}
-
-function selectWind(e) {
-  mode = SecondGriffin.WeatherGraph.WIND;
-  redraw();
-  e.preventDefault();
-}
-
 function scroll(e) {
   var rightEdge = window.pageXOffset + window.innerWidth;
   if (rightEdge > document.getElementById("graph").width - 40) {
@@ -284,6 +333,23 @@ function scroll(e) {
 </script>
 </head>
 <body onload="onload()">
+<div id="menu" style="display: none;">
+  <h1>Menu</h1>
+  <ul>
+    <li>
+      <a href="#" id="menuTemperatureSelect" data-command="mode" data-mode="1">
+        <strong>Temperature</strong>
+        <span>Temperature, heat index, and dew point</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" id="menuWindSelect" data-command="mode" data-mode="2">
+        <strong>Wind</strong>
+        <span>Wind speed, wind direction, and gusts</span>
+      </a>
+    </li>
+  </ul>
+</div>
 <div id="loaded" style="display: none;">
   <canvas id="yaxis" width="0" height="0"></canvas>
   <canvas id="graph" width="0" height="0"></canvas>
@@ -291,10 +357,6 @@ function scroll(e) {
   <header>
     <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
   </header>
-  <div class="selection">
-    <a href="#" id="temperatureSelect">Temperature</a> |
-    <a href="#" id="windSelect">Wind</a>
-  </div>
 </div>
 <div id="loading">
   <div id="message">Loading.</div>
