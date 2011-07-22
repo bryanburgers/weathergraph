@@ -404,14 +404,19 @@ SecondGriffin = window.SecondGriffin || { };
     }
   };
 
-  graph.prototype.drawTemperatureData = function(ctx, data, graphSettings) {
-    ctx.save();
-
+  graph.prototype.setDefaultGraphSettings = function(ctx) {
     ctx.lineWidth = 1.5;
     ctx.shadowColor = "rgba(0,0,0,0.3)";
     ctx.shadowBlur = 3;
-    ctx.shadowOffsetY = 2;
+    // For some reason, the shadow is opposite on Android.
+    ctx.shadowOffsetY = -2;
     ctx.shadowOffsetX = 0;
+  };
+
+  graph.prototype.drawTemperatureData = function(ctx, data, graphSettings) {
+    ctx.save();
+
+    this.setDefaultGraphSettings(ctx);
 
     // Draw lines.
     for (var i = 1; data[i]; i++) {
@@ -509,6 +514,8 @@ SecondGriffin = window.SecondGriffin || { };
 
   graph.prototype.drawWindData = function(ctx, data, graphSettings) {
     ctx.save();
+
+    this.setDefaultGraphSettings(ctx);
 
     var drawWindVein = function(ctx, x, y, wind, direction) {
       var knots = convertToKnots(wind);
@@ -701,9 +708,12 @@ SecondGriffin = window.SecondGriffin || { };
     for (var i = 0; keyItems[i]; i++) {
       var y = initialOffset + i * offset;
       ctx.strokeStyle = keyItems[i].color;
+      ctx.save();
+      this.setDefaultGraphSettings(ctx);
       drawLine(ctx, x1, y, x2, y);
       drawPoint(ctx, x1, y);
       drawPoint(ctx, x2, y);
+      ctx.restore();
       drawText(xText, y, keyItems[i].name);
     }
 
