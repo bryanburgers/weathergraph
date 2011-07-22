@@ -55,21 +55,6 @@ header h1 {
   font-style: italic;
 }
 
-.selection {
-  position: fixed;
-  bottom: 0;
-  padding: 1em 0.75em;
-}
-.selection a {
-  margin: 0 0.25em;
-  text-decoration: none;
-  color: black;
-}
-.selection a:hover {
-  text-decoration: underline;
-}
-
-
 #menu {
   position: fixed;
   top: 20px;
@@ -187,13 +172,6 @@ function onload() {
   var keyCanvas = document.getElementById("key");
   g = new SecondGriffin.WeatherGraph(graphCanvas, yAxisCanvas, keyCanvas);
   window.addEventListener("resize", redraw, false);
-
-  var tempSelect = document.getElementById("temperatureSelect");
-  var windSelect = document.getElementById("windSelect");
-  tempSelect.addEventListener("click", selectTemperature, false);
-  windSelect.addEventListener("click", selectWind, false);
-  tempSelect.addEventListener("touchstart", selectTemperatureTouch, false);
-  windSelect.addEventListener("touchstart", selectWindTouch, false);
 
   setMessage("Retrieving location.");
 
@@ -342,28 +320,6 @@ function setMessage(text) {
   }
 }
 
-function selectTemperatureTouch(e) {
-  document.getElementById("temperatureSelect").removeEventListener("click", selectTemperature, false);
-  selectTemperature(e);
-}
-
-function selectTemperature(e) {
-  mode = SecondGriffin.WeatherGraph.TEMPERATURE;
-  redraw();
-  e.preventDefault();
-}
-
-function selectWindTouch(e) {
-  document.getElementById("windSelect").removeEventListener("click", selectWind, false);
-  selectWind(e);
-}
-
-function selectWind(e) {
-  mode = SecondGriffin.WeatherGraph.WIND;
-  redraw();
-  e.preventDefault();
-}
-
 function scroll(e) {
   var rightEdge = window.pageXOffset + window.innerWidth;
   if (rightEdge > document.getElementById("graph").width - 40) {
@@ -401,10 +357,6 @@ function scroll(e) {
   <header>
     <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
   </header>
-  <div class="selection">
-    <a href="#" id="temperatureSelect">Temperature</a> |
-    <a href="#" id="windSelect">Wind</a>
-  </div>
 </div>
 <div id="loading">
   <div id="message">Loading.</div>
