@@ -17,40 +17,42 @@ var mode = SecondGriffin.WeatherGraph.TEMPERATURE;
 var position = null;
 var hoursAhead = 0;
 
-/*
-data = [
-{ day: "2011-07-13", hour:  7, temp: 70, apparent: 72, dew: 59, wind: 3, windDirection: "N", gust: null },
-{ day: "2011-07-13", hour:  8, temp: 70, apparent: 71, dew: 57, wind: 4, windDirection: "NNE", gust: null },
-{ day: "2011-07-13", hour:  9, temp: 71, apparent: 72, dew: 59, wind: 5, windDirection: "NE", gust: 22 },
-{ day: "2011-07-13", hour: 10, temp: 72, apparent: 78, dew: 60, wind: 7, windDirection: "ENE", gust: 23 },
-{ day: "2011-07-13", hour: 11, temp: 77, apparent: 81, dew: 61, wind: 9, windDirection: "E", gust: 28 },
-{ day: "2011-07-13", hour: 12, temp: 79, apparent: 88, dew: 59, wind: 10, windDirection: "ESE", gust: null },
-{ day: "2011-07-13", hour: 13, temp: 82, apparent: 89, dew: 62, wind: 11, windDirection: "SE", gust: null },
-{ day: "2011-07-13", hour: 14, temp: 80, apparent: 90, dew: 62, wind: 14, windDirection: "SSE", gust: null },
-{ day: "2011-07-13", hour: 15, temp: 81, apparent: 91, dew: 63, wind: 15, windDirection: "S", gust: null },
-{ day: "2011-07-13", hour: 16, temp: 83, apparent: 92, dew: 65, wind: 16, windDirection: "SSW", gust: null },
-{ day: "2011-07-13", hour: 17, temp: 81, apparent: 89, dew: 65, wind: 17, windDirection: "SW", gust: null },
-{ day: "2011-07-13", hour: 18, temp: 79, apparent: 88, dew: 68, wind: 19, windDirection: "WSW", gust: 22 },
-{ day: "2011-07-13", hour: 19, temp: 78, apparent: 85, dew: 69, wind: 20, windDirection: "W", gust: 28 },
-{ day: "2011-07-13", hour: 20, temp: 76, apparent: 76, dew: 71, wind: 21, windDirection: "WNW", gust: null },
-{ day: "2011-07-13", hour: 21, temp: 72, apparent: 72, dew: 70, wind: 24, windDirection: "NW", gust: null },
-{ day: "2011-07-13", hour: 22, temp: 70, apparent: 70, dew: 51, wind: 25, windDirection: "NNW", gust: null },
-{ day: "2011-07-13", hour: 23, temp: 70, apparent: 70, dew: 57, wind: 26, windDirection: "N", gust: 21 },
-{ day: "2011-07-14", hour:  0, temp: 71, apparent: 71, dew: 59, wind: 29, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour:  1, temp: 72, apparent: 72, dew: 60, wind: 30, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour:  2, temp: 77, apparent: 77, dew: 61, wind: 31, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour:  3, temp: 79, apparent: 88, dew: 59, wind: 10, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour:  4, temp: 82, apparent: 89, dew: 62, wind: 10, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour:  5, temp: 80, apparent: 90, dew: 62, wind: 10, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour:  6, temp: 81, apparent: 91, dew: 63, wind: 10, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour:  7, temp: 83, apparent: 92, dew: 65, wind: 10, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour:  8, temp: 81, apparent: 89, dew: 65, wind: 10, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour:  9, temp: 79, apparent: 88, dew: 68, wind: 10, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour: 10, temp: 78, apparent: 85, dew: 69, wind: 10, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour: 11, temp: 76, apparent: 81, dew: 71, wind: 10, windDirection: "N", gust: null },
-{ day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70, wind: 10, windDirection: "N", gust: null },
-];
-*/
+data = getTestData();
+
+function getTestData() {
+  return [
+  { day: "2011-07-13", hour:  7, temp: 70, apparent: 72, dew: 59, wind: 3, windDirection: "N", gust: null },
+  { day: "2011-07-13", hour:  8, temp: 70, apparent: 71, dew: 57, wind: 4, windDirection: "NNE", gust: null },
+  { day: "2011-07-13", hour:  9, temp: 71, apparent: 72, dew: 59, wind: 5, windDirection: "NE", gust: 22 },
+  { day: "2011-07-13", hour: 10, temp: 72, apparent: 78, dew: 60, wind: 7, windDirection: "ENE", gust: 23 },
+  { day: "2011-07-13", hour: 11, temp: 77, apparent: 81, dew: 61, wind: 9, windDirection: "E", gust: 28 },
+  { day: "2011-07-13", hour: 12, temp: 79, apparent: 88, dew: 59, wind: 10, windDirection: "ESE", gust: null },
+  { day: "2011-07-13", hour: 13, temp: 82, apparent: 89, dew: 62, wind: 11, windDirection: "SE", gust: null },
+  { day: "2011-07-13", hour: 14, temp: 80, apparent: 90, dew: 62, wind: 14, windDirection: "SSE", gust: null },
+  { day: "2011-07-13", hour: 15, temp: 81, apparent: 91, dew: 63, wind: 15, windDirection: "S", gust: null },
+  { day: "2011-07-13", hour: 16, temp: 83, apparent: 92, dew: 65, wind: 16, windDirection: "SSW", gust: null },
+  { day: "2011-07-13", hour: 17, temp: 81, apparent: 89, dew: 65, wind: 17, windDirection: "SW", gust: null },
+  { day: "2011-07-13", hour: 18, temp: 79, apparent: 88, dew: 68, wind: 19, windDirection: "WSW", gust: 22 },
+  { day: "2011-07-13", hour: 19, temp: 78, apparent: 85, dew: 69, wind: 20, windDirection: "W", gust: 28 },
+  { day: "2011-07-13", hour: 20, temp: 76, apparent: 76, dew: 71, wind: 21, windDirection: "WNW", gust: null },
+  { day: "2011-07-13", hour: 21, temp: 72, apparent: 72, dew: 70, wind: 24, windDirection: "NW", gust: null },
+  { day: "2011-07-13", hour: 22, temp: 70, apparent: 70, dew: 51, wind: 25, windDirection: "NNW", gust: null },
+  { day: "2011-07-13", hour: 23, temp: 70, apparent: 70, dew: 57, wind: 26, windDirection: "N", gust: 21 },
+  { day: "2011-07-14", hour:  0, temp: 71, apparent: 71, dew: 59, wind: 29, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  1, temp: 72, apparent: 72, dew: 60, wind: 30, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  2, temp: 77, apparent: 77, dew: 61, wind: 31, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  3, temp: 79, apparent: 88, dew: 59, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  4, temp: 82, apparent: 89, dew: 62, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  5, temp: 80, apparent: 90, dew: 62, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  6, temp: 81, apparent: 91, dew: 63, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  7, temp: 83, apparent: 92, dew: 65, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  8, temp: 81, apparent: 89, dew: 65, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  9, temp: 79, apparent: 88, dew: 68, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour: 10, temp: 78, apparent: 85, dew: 69, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour: 11, temp: 76, apparent: 81, dew: 71, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70, wind: 10, windDirection: "N", gust: null },
+  ];
+}
 
 document.addEventListener('weathergraph.command', onCommand, false);
 
