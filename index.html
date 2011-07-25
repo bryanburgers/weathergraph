@@ -27,7 +27,6 @@
   text-align: center;
 }
 
-
 header {
   position: fixed;
   top: 0;
@@ -147,7 +146,6 @@ data = [
 
 function redraw() {
   if (!data || data.length == 0) return;
-  g.getYAxisCanvas().width = 30;
   g.setGridWidth(30);
   g.setMaximumGridHeight(30);
   g.setMaximumVerticalSpace(300);
@@ -353,7 +351,7 @@ function scroll(e) {
 <div id="loaded" style="display: none;">
   <canvas id="yaxis" width="0" height="0"></canvas>
   <canvas id="graph" width="0" height="0"></canvas>
-  <canvas id="key" width="150" height="18"></canvas>
+  <canvas id="key" width="150" height="22"></canvas>
   <header>
     <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
   </header>

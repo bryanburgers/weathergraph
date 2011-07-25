@@ -92,10 +92,10 @@ SecondGriffin = window.SecondGriffin || { };
     this.nightBackground = "rgb(220,220,220)";
 
     this.topSpacing = 18;
-    this.leftSpacing = 10;
+    this.leftSpacing = 30;
     this.rightSpacing = 10;
     this.bottomSpacing = 0;
-    this.horizontalAxisHeight = 30;
+    this.horizontalAxisHeight = 40;
 
     return this;
   };
@@ -158,6 +158,7 @@ SecondGriffin = window.SecondGriffin || { };
 
     canvas.width = (data.length + 1) * this.gridWidth + this.leftSpacing + this.rightSpacing;
     canvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
+    yAxisCanvas.width = 40;
     yAxisCanvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
     keyCanvas.width = window.innerWidth;
     keyCanvas.style.top = canvas.height.toString() + "px";
@@ -172,6 +173,9 @@ SecondGriffin = window.SecondGriffin || { };
 
     var graphSettings = new GraphSettings(bounds.x, bounds.y, rect, rect.width / (bounds.x.max - bounds.x.min), rect.height / (bounds.y.max - bounds.y.min));
 
+    ctx.font = "normal 400 14px Verdana, Arial, sans-serif";
+    yctx.font = "normal 400 14px Verdana, Arial, sans-serif";
+    kctx.font = "normal 400 14px Verdana, Arial, sans-serif";
     this.drawBackground(ctx, data, graphSettings);
     this.drawLines(ctx, data, graphSettings);
     this.drawXAxis(ctx, data, graphSettings);
@@ -311,7 +315,7 @@ SecondGriffin = window.SecondGriffin || { };
     for (var i = 0; data[i]; i++) {
       if (data[i].hour % 3 == 1) {
         var tx = graphSettings.translateX(i);
-        var ty = graphSettings.graphArea.bottom + 10;
+        var ty = graphSettings.graphArea.bottom + 15;
         if (i == 0) {
           // If it's really the first one, then we can't center it, because
           // then our line for the date will cut right though it.
@@ -324,7 +328,7 @@ SecondGriffin = window.SecondGriffin || { };
       }
       if (data[i].hour == 0 || i == 0) {
         var tx = graphSettings.translateX(i);
-        var ty = graphSettings.graphArea.bottom + 22;
+        var ty = graphSettings.graphArea.bottom + 32;
 
         if (data[i].hour < 20 && i < data.length - 4) {
           // Only draw the date if it isn't going to overlap the next date (data[i].hour < 20)
@@ -348,7 +352,7 @@ SecondGriffin = window.SecondGriffin || { };
         // of the graph (i < data.length - 4)
         if (i > 4 && i < data.length - 4) {
           var tx = graphSettings.translateX(i);
-          var ty = graphSettings.graphArea.bottom + 22;
+          var ty = graphSettings.graphArea.bottom + 32;
           drawLeftAlignedText(ctx, tx + 3, ty, data[i].day);
         }
       }
@@ -375,7 +379,7 @@ SecondGriffin = window.SecondGriffin || { };
     var startY = Math.floor(graphSettings.bounds.y.min / 10) * 10;
     for (var y = startY; y <= graphSettings.bounds.y.max; y += graphSettings.bounds.y.by) {
       var ty = graphSettings.translateY(y);                 
-      drawRightAlignedText(ctx, 25, ty + 3, y.toString() + suffix);
+      drawRightAlignedText(ctx, ctx.canvas.width - 2, ty + 3, y.toString() + suffix);
     }
 
     ctx.restore();
@@ -711,7 +715,7 @@ SecondGriffin = window.SecondGriffin || { };
       var xLeft = i * barWidth;
       ctx.fillRect(xLeft, rect.top, barWidth, rect.height - 4);
       ctx.fillStyle = "white";
-      drawText(xLeft, rect.top + 10, keyItems[i].name);
+      drawText(xLeft, rect.top + 14, keyItems[i].name);
     }
 
     ctx.restore();
