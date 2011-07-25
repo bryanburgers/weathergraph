@@ -157,7 +157,7 @@ function initializeMenuOptions() {
 
 // Initialize a single menu option to handle event commands
 function initializeMenuOption(el, menu) {
-  el.addEventListener('click', function(e) {
+  el.addEventListener('touchstart', function(e) {
     menu.style.display = 'none';
     document.removeEventListener('backbutton', onBackButton, false);
 
