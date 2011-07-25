@@ -11,51 +11,27 @@
 <script src="graph.js"></script>
 <script>
 
+// Our graph. We can initialize this once we have our canvases initialized.
 var g = null;
+
+// The data to show in our graph.
 var data = [];
+
+// Which mode to show. By default, show the temperature graph, but
+// we have a few more, accessible through the options.
 var mode = SecondGriffin.WeatherGraph.TEMPERATURE;
+
+// The user's current geolocation.
 var position = null;
+
+// How much data we've loaded from weather.gov.
 var hoursAhead = 0;
 
+// If we're debugging, use this to get some test data.
+// Otherwise, comment this out.
 data = getTestData();
 
-function getTestData() {
-  return [
-  { day: "2011-07-13", hour:  7, temp: 70, apparent: 72, dew: 59, wind: 3, windDirection: "N", gust: null },
-  { day: "2011-07-13", hour:  8, temp: 70, apparent: 71, dew: 57, wind: 4, windDirection: "NNE", gust: null },
-  { day: "2011-07-13", hour:  9, temp: 71, apparent: 72, dew: 59, wind: 5, windDirection: "NE", gust: 22 },
-  { day: "2011-07-13", hour: 10, temp: 72, apparent: 78, dew: 60, wind: 7, windDirection: "ENE", gust: 23 },
-  { day: "2011-07-13", hour: 11, temp: 77, apparent: 81, dew: 61, wind: 9, windDirection: "E", gust: 28 },
-  { day: "2011-07-13", hour: 12, temp: 79, apparent: 88, dew: 59, wind: 10, windDirection: "ESE", gust: null },
-  { day: "2011-07-13", hour: 13, temp: 82, apparent: 89, dew: 62, wind: 11, windDirection: "SE", gust: null },
-  { day: "2011-07-13", hour: 14, temp: 80, apparent: 90, dew: 62, wind: 14, windDirection: "SSE", gust: null },
-  { day: "2011-07-13", hour: 15, temp: 81, apparent: 91, dew: 63, wind: 15, windDirection: "S", gust: null },
-  { day: "2011-07-13", hour: 16, temp: 83, apparent: 92, dew: 65, wind: 16, windDirection: "SSW", gust: null },
-  { day: "2011-07-13", hour: 17, temp: 81, apparent: 89, dew: 65, wind: 17, windDirection: "SW", gust: null },
-  { day: "2011-07-13", hour: 18, temp: 79, apparent: 88, dew: 68, wind: 19, windDirection: "WSW", gust: 22 },
-  { day: "2011-07-13", hour: 19, temp: 78, apparent: 85, dew: 69, wind: 20, windDirection: "W", gust: 28 },
-  { day: "2011-07-13", hour: 20, temp: 76, apparent: 76, dew: 71, wind: 21, windDirection: "WNW", gust: null },
-  { day: "2011-07-13", hour: 21, temp: 72, apparent: 72, dew: 70, wind: 24, windDirection: "NW", gust: null },
-  { day: "2011-07-13", hour: 22, temp: 70, apparent: 70, dew: 51, wind: 25, windDirection: "NNW", gust: null },
-  { day: "2011-07-13", hour: 23, temp: 70, apparent: 70, dew: 57, wind: 26, windDirection: "N", gust: 21 },
-  { day: "2011-07-14", hour:  0, temp: 71, apparent: 71, dew: 59, wind: 29, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour:  1, temp: 72, apparent: 72, dew: 60, wind: 30, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour:  2, temp: 77, apparent: 77, dew: 61, wind: 31, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour:  3, temp: 79, apparent: 88, dew: 59, wind: 10, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour:  4, temp: 82, apparent: 89, dew: 62, wind: 10, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour:  5, temp: 80, apparent: 90, dew: 62, wind: 10, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour:  6, temp: 81, apparent: 91, dew: 63, wind: 10, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour:  7, temp: 83, apparent: 92, dew: 65, wind: 10, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour:  8, temp: 81, apparent: 89, dew: 65, wind: 10, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour:  9, temp: 79, apparent: 88, dew: 68, wind: 10, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour: 10, temp: 78, apparent: 85, dew: 69, wind: 10, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour: 11, temp: 76, apparent: 81, dew: 71, wind: 10, windDirection: "N", gust: null },
-  { day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70, wind: 10, windDirection: "N", gust: null },
-  ];
-}
-
-document.addEventListener('weathergraph.command', onCommand, false);
-
+// Redraw the graph.
 function redraw() {
   if (!data || data.length == 0) return;
   g.setGridWidth(30);
@@ -63,7 +39,102 @@ function redraw() {
   g.setMaximumVerticalSpace(300);
 
   g.redraw(data, mode);
+  document.getElementById('loaded').style.display = 'block';
+}
+
+// Called when the HTML is all loaded and ready.
+function onload() {
+  // Event handler for when PhoneGap is ready
+  document.addEventListener('deviceready', onDeviceReady, false);
+
+  // Prepare our menu options.
+  initializeMenuOptions();
+
+  // Create the actual graph.
+  var graphCanvas = document.getElementById("graph");
+  var yAxisCanvas = document.getElementById("yaxis");
+  var keyCanvas = document.getElementById("key");
+  g = new SecondGriffin.WeatherGraph(graphCanvas, yAxisCanvas, keyCanvas);
+
+  // When we resize our window, we need to redraw the graph.
+  window.addEventListener("resize", redraw, false);
+
+  // Set the default graph type.
+  document.getElementById('graphtype').innerText = "Temperature";
+
+  refresh();
+}
+
+function refresh() {
+  document.getElementById('loaded').style.display = 'none';
+  // If we can, start loading the user's geolocation.
+  setMessage("Retrieving location.");
+  if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
+    navigator.geolocation.getCurrentPosition(
+      function (success) {
+        var event = document.createEvent("Event");
+	event.initEvent("weathergraph.geolocate");
+	event.success = true;
+	event.coords = success.coords;
+	document.dispatchEvent(event);
+      },
+      function (failure) {
+        var event = document.createEvent("Event");
+	event.initEvent("weathergraph.geolocate");
+	event.success = false;
+	document.dispatchEvent(event);
+      }
+    );
+  }
+}
+
+// Called when a command is triggered.
+// This can be when a menu option is chosen.
+document.addEventListener('weathergraph.command', onCommand, false);
+function onCommand(e) {
+  var command = e.commandData.command;
+  var parameter = e.commandData.parameter;
+
+  if (command == 'mode') {
+    setMode(parseInt(parameter));
+    redraw();
+  }
+  else if (command == 'refresh') {
+    refresh();
+  }
+}
+
+// Called when geolocation finishes, either successfully
+// or unsuccessfully.
+document.addEventListener('weathergraph.geolocate', onGeolocate, false);
+function onGeolocate(e) {
+  if (e.success) {
+    data = []; // Clear old data
+    position = e.coords; // Set the current position
+    hoursAhead = 0; // Set the hours ahead to load
+    loadData(); // Load the data
+    loadLocationName(position); // Find the name of the location
+  }
+  else {
+    setMessage("Failed to retrieve location.");
+    var event = document.createEvent("Event");
+    event.initEvent("weathergraph.locationnamechange", true, true);
+    event.locationName = "Failed to retrieve location";
+    document.dispatchEvent(event);
+  }
+}
+
+// Called when the user's geolocation name changes.
+document.addEventListener('weathergraph.locationnamechange', onLocationNameChange, false);
+function onLocationNameChange(e) {
+  document.getElementById("location").innerText = e.locationName;
+}
+
+// Called when the graph mode changes.
+document.addEventListener('weathergraph.modechange', onModeChange, false);
+function onModeChange(e) {
   var graphtype = document.getElementById('graphtype');
+  if (!graphtype) { return; }
   switch (mode) {
     case SecondGriffin.WeatherGraph.TEMPERATURE:
       graphtype.innerText = 'Temperature';
@@ -72,50 +143,15 @@ function redraw() {
       graphtype.innerText = 'Wind';
       break;
   }
-  document.getElementById('loaded').style.display = 'block';
 }
 
 
-function onload() {
-  var graphCanvas = document.getElementById("graph");
-  var yAxisCanvas = document.getElementById("yaxis");
-  var keyCanvas = document.getElementById("key");
-  g = new SecondGriffin.WeatherGraph(graphCanvas, yAxisCanvas, keyCanvas);
-  window.addEventListener("resize", redraw, false);
-
-  setMessage("Retrieving location.");
-
-  if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
-    navigator.geolocation.getCurrentPosition(
-      function (success) {
-        data = []; // Clear old data
-        position = success.coords; // Set the current position
-	hoursAhead = 0; // Set the hours ahead to load
-        loadData(); // Load the data
-        loadLocationName(position); // Find the name of the location
-      },
-      function (failure) { setMessage("Failed to retrieve location."); }
-    );
-  }
-  
-  // Event handler for when PhoneGap is ready
-  document.addEventListener('deviceready', onDeviceReady, false);
-
+function initializeMenuOptions() {
   // Initialize the menu options
   var menu = document.getElementById('menu');
   var buttons = menu.getElementsByTagName("a");
   for (var i = 0; i < buttons.length; i++) {
     initializeMenuOption(buttons[i], menu);
-  }
-}
-
-function onCommand(e) {
-  var command = e.commandData.command;
-  var parameter = e.commandData.parameter;
-
-  if (command == 'mode') {
-    mode = parseInt(parameter);
-    redraw();
   }
 }
 
@@ -167,8 +203,16 @@ function onBackButton(e) {
 }
 
 function loadLocationName(position) {
+
+  function raiseLocationNameChangedEvent(locationName) {
+    var event = document.createEvent("Event");
+    event.initEvent("weathergraph.locationnamechange", true, true);
+    event.locationName = locationName;
+    document.dispatchEvent(event);
+  }
+
   // Until we actually have a name of a place, just put in the Lat/Long.
-  document.getElementById("location").innerText = (Math.round(position.latitude * 100) / 100).toString() + ", " + (Math.round(position.longitude * 100) / 100).toString();
+  raiseLocationNameChangedEvent((Math.round(position.latitude * 100) / 100).toString() + ", " + (Math.round(position.longitude * 100) / 100).toString());
 
   var geocoder = new google.maps.Geocoder();
   var location = new google.maps.LatLng(position.latitude, position.longitude);
@@ -203,7 +247,7 @@ function loadLocationName(position) {
         location = location.substring(0, location.lastIndexOf(", USA"));
       }
 
-      document.getElementById("location").innerText = location;
+      raiseLocationNameChangedEvent(location);
     }
   });
 }
@@ -257,6 +301,50 @@ function scroll(e) {
   }
 }
 
+function setMode(m) {
+  mode = m;
+  var event = document.createEvent("Event");
+  event.initEvent("weathergraph.modechange", true, true);
+  document.dispatchEvent(event);
+}
+
+// Test data, because Chrome won't get the location when using the file:/// schema, so having this
+// data available can help.
+function getTestData() {
+  return [
+  { day: "2011-07-13", hour:  7, temp: 70, apparent: 72, dew: 59, wind: 3, windDirection: "N", gust: null },
+  { day: "2011-07-13", hour:  8, temp: 70, apparent: 71, dew: 57, wind: 4, windDirection: "NNE", gust: null },
+  { day: "2011-07-13", hour:  9, temp: 71, apparent: 72, dew: 59, wind: 5, windDirection: "NE", gust: 22 },
+  { day: "2011-07-13", hour: 10, temp: 72, apparent: 78, dew: 60, wind: 7, windDirection: "ENE", gust: 23 },
+  { day: "2011-07-13", hour: 11, temp: 77, apparent: 81, dew: 61, wind: 9, windDirection: "E", gust: 28 },
+  { day: "2011-07-13", hour: 12, temp: 79, apparent: 88, dew: 59, wind: 10, windDirection: "ESE", gust: null },
+  { day: "2011-07-13", hour: 13, temp: 82, apparent: 89, dew: 62, wind: 11, windDirection: "SE", gust: null },
+  { day: "2011-07-13", hour: 14, temp: 80, apparent: 90, dew: 62, wind: 14, windDirection: "SSE", gust: null },
+  { day: "2011-07-13", hour: 15, temp: 81, apparent: 91, dew: 63, wind: 15, windDirection: "S", gust: null },
+  { day: "2011-07-13", hour: 16, temp: 83, apparent: 92, dew: 65, wind: 16, windDirection: "SSW", gust: null },
+  { day: "2011-07-13", hour: 17, temp: 81, apparent: 89, dew: 65, wind: 17, windDirection: "SW", gust: null },
+  { day: "2011-07-13", hour: 18, temp: 79, apparent: 88, dew: 68, wind: 19, windDirection: "WSW", gust: 22 },
+  { day: "2011-07-13", hour: 19, temp: 78, apparent: 85, dew: 69, wind: 20, windDirection: "W", gust: 28 },
+  { day: "2011-07-13", hour: 20, temp: 76, apparent: 76, dew: 71, wind: 21, windDirection: "WNW", gust: null },
+  { day: "2011-07-13", hour: 21, temp: 72, apparent: 72, dew: 70, wind: 24, windDirection: "NW", gust: null },
+  { day: "2011-07-13", hour: 22, temp: 70, apparent: 70, dew: 51, wind: 25, windDirection: "NNW", gust: null },
+  { day: "2011-07-13", hour: 23, temp: 70, apparent: 70, dew: 57, wind: 26, windDirection: "N", gust: 21 },
+  { day: "2011-07-14", hour:  0, temp: 71, apparent: 71, dew: 59, wind: 29, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  1, temp: 72, apparent: 72, dew: 60, wind: 30, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  2, temp: 77, apparent: 77, dew: 61, wind: 31, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  3, temp: 79, apparent: 88, dew: 59, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  4, temp: 82, apparent: 89, dew: 62, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  5, temp: 80, apparent: 90, dew: 62, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  6, temp: 81, apparent: 91, dew: 63, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  7, temp: 83, apparent: 92, dew: 65, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  8, temp: 81, apparent: 89, dew: 65, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour:  9, temp: 79, apparent: 88, dew: 68, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour: 10, temp: 78, apparent: 85, dew: 69, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour: 11, temp: 76, apparent: 81, dew: 71, wind: 10, windDirection: "N", gust: null },
+  { day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70, wind: 10, windDirection: "N", gust: null },
+  ];
+}
+
 </script>
 </head>
 <body onload="onload()">
@@ -264,15 +352,21 @@ function scroll(e) {
   <h1>Menu</h1>
   <ul>
     <li>
-      <a href="#" id="menuTemperatureSelect" data-command="mode" data-parameter="1">
+      <a href="#" data-command="mode" data-parameter="1">
         <strong>Temperature</strong>
         <span>Temperature, heat index, and dew point</span>
       </a>
     </li>
     <li>
-      <a href="#" id="menuWindSelect" data-command="mode" data-parameter="2">
+      <a href="#" data-command="mode" data-parameter="2">
         <strong>Wind</strong>
         <span>Wind speed, wind direction, and gusts</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" data-command="refresh">
+        <strong>Refresh</strong>
+        <span>Refresh location and weather data</span>
       </a>
     </li>
   </ul>
