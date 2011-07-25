@@ -159,6 +159,7 @@ SecondGriffin = window.SecondGriffin || { };
     canvas.width = (data.length + 1) * this.gridWidth + this.leftSpacing + this.rightSpacing;
     canvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
     yAxisCanvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
+    keyCanvas.width = window.innerWidth;
 
     var rect = new Rectangle(
       this.leftSpacing,
@@ -691,30 +692,25 @@ SecondGriffin = window.SecondGriffin || { };
     ctx.save();
     ctx.clearRect(rect.x, rect.y, rect.width, rect.height);
 
-    var x1 = 5.5;
-    var x2 = x1 + 20;
-    var xText = x2 + 7;
-
     var initialOffset = 5.5;
     var offset = 15;
+    var barWidth = rect.width / keyItems.length;
 
     var drawText = function(x, y, text, color) {
       if (ctx.fillText && ctx.measureText) {
-        ctx.fillText(text, x, y + 3);
+        var measurement = ctx.measureText(text);
+        ctx.fillText(text, x + (barWidth / 2) - (measurement.width / 2), y);
       }
     };
+    this.setDefaultGraphSettings(ctx);
 
-    ctx.fillStyle = "black";
     for (var i = 0; keyItems[i]; i++) {
-      var y = initialOffset + i * offset;
-      ctx.strokeStyle = keyItems[i].color;
-      ctx.save();
-      this.setDefaultGraphSettings(ctx);
-      drawLine(ctx, x1, y, x2, y);
-      drawPoint(ctx, x1, y);
-      drawPoint(ctx, x2, y);
-      ctx.restore();
-      drawText(xText, y, keyItems[i].name);
+      var y = 10;
+      ctx.fillStyle = keyItems[i].color;
+      var xLeft = i * barWidth;
+      ctx.fillRect(xLeft, rect.top, barWidth, rect.height - 4);
+      ctx.fillStyle = "white";
+      drawText(xLeft, rect.top + 10, keyItems[i].name);
     }
 
     ctx.restore();
