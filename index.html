@@ -145,7 +145,7 @@ function onModeChange(e) {
   }
 }
 
-
+// Initialize the menu to handle event commands
 function initializeMenuOptions() {
   // Initialize the menu options
   var menu = document.getElementById('menu');
@@ -155,6 +155,7 @@ function initializeMenuOptions() {
   }
 }
 
+// Initialize a single menu option to handle event commands
 function initializeMenuOption(el, menu) {
   el.addEventListener('click', function(e) {
     menu.style.display = 'none';
@@ -172,11 +173,13 @@ function initializeMenuOption(el, menu) {
   }, false);
 }
 
+// Raised when the PhoneGap is ready.
 function onDeviceReady(e) {
   // Event handler for the menu button
   document.addEventListener('menubutton', onMenuButton, false);
 }
 
+// Raised when the Menu Button on and Android device is pressed.
 function onMenuButton(e) {
   var menu = document.getElementById('menu');
   if (menu.style.display == 'block')
@@ -191,6 +194,7 @@ function onMenuButton(e) {
   }
 }
 
+// Raised when the Back Button on and Android device is pressed.
 function onBackButton(e) {
   // If the menu is showing, hide it. Otherwise, ignore this button.
   var menu = document.getElementById('menu');
@@ -202,6 +206,12 @@ function onBackButton(e) {
   }
 }
 
+// Get the location name based on the user's geolocation.
+// This function raises the 'weathergraph.locationnamechange'
+// event each time it determines a name for the location.
+// Initially, this method raises the event with just the
+// latitude and longitude. Later, it will raise the event
+// with an actual place name.
 function loadLocationName(position) {
 
   function raiseLocationNameChangedEvent(locationName) {
@@ -252,6 +262,7 @@ function loadLocationName(position) {
   });
 }
 
+// Load the weather from weather.gov given the current geolocation.
 function loadData() {
   setMessage("Loading weather data.");
   var url = "http://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=hi&w3=sfcwind&w3u=1&AheadHour=" + hoursAhead + "&FcstType=digital&textField1=" + position.latitude + "&textField2=" + position.longitude;
@@ -277,6 +288,7 @@ function loadData() {
   xhr.send(null);
 }
 
+// Set a user-message when finding the location and loading data.
 function setMessage(text) {
   var message = document.getElementById("message");
   if (!message) return;
@@ -291,6 +303,9 @@ function setMessage(text) {
   }
 }
 
+// Raised when the user scrolls. We want to determine if the user
+// has scrolled all the way to the end of the graph, and if so,
+// load more data if we can.
 function scroll(e) {
   var rightEdge = window.pageXOffset + window.innerWidth;
   if (rightEdge > document.getElementById("graph").width - 40) {
@@ -301,6 +316,7 @@ function scroll(e) {
   }
 }
 
+// Set the mode for the graph to use.
 function setMode(m) {
   mode = m;
   var event = document.createEvent("Event");
