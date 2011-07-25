@@ -160,6 +160,7 @@ SecondGriffin = window.SecondGriffin || { };
     canvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
     yAxisCanvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
     keyCanvas.width = window.innerWidth;
+    keyCanvas.style.top = canvas.height.toString() + "px";
 
     var rect = new Rectangle(
       this.leftSpacing,
