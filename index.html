@@ -66,6 +66,7 @@ function onload() {
 
   // Set the default graph type.
   document.getElementById('graphtype').innerText = "Temperature";
+  document.getElementById('locationButton').addEventListener('click', onChooseLocation, false);
 
   refresh();
 }
@@ -106,6 +107,9 @@ function onCommand(e) {
   }
   else if (command == 'refresh') {
     refresh();
+  }
+  else if (command == 'changelocation') {
+    document.getElementById('chooselocation').style.display = "block";
   }
 }
 
@@ -151,6 +155,28 @@ function onModeChange(e) {
       graphtype.innerText = 'Sky';
       break;
   }
+}
+
+function onChooseLocation(e) {
+  var location = document.getElementById('locationTextbox').value;
+  var g = new google.maps.Geocoder();
+  g.geocode({ 'address': location }, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      var gLocation = results[0].geometry.location;
+      var location = {
+        'latitude': gLocation.lat(),
+	'longitude': gLocation.lng()
+      };
+      console.log(location);
+      var event = document.createEvent("Event");
+      event.initEvent("weathergraph.geolocate");
+      event.success = true;
+      event.coords = location; 
+      document.dispatchEvent(event);
+    }
+    else {
+    }
+  });
 }
 
 // Initialize the menu to handle event commands
@@ -372,7 +398,7 @@ function getTestData() {
 </script>
 </head>
 <body onload="onload()">
-<div id="menu" style="display: none;">
+<div id="menu" class="popup" style="display: none;">
   <h1>Menu</h1>
   <ul>
     <li>
@@ -399,7 +425,20 @@ function getTestData() {
         <span>Refresh location and weather data</span>
       </a>
     </li>
+    <li>
+      <a href="#" data-command="changelocation">
+        <strong>Change location</strong>
+	<span>Search for a new location manually</span>
+      </a>
+    </li>
   </ul>
+</div>
+<div id="chooselocation" class="popup" style="display: none;">
+  <h1>Find a location</h1>
+  <div class="body">
+    <p><input type="text" id="locationTextbox" placeholder="City or zip-code"></input></p>
+    <p><input type="button" id="locationButton" value="Graph"></input></p>
+  </div>
 </div>
 <div id="loaded" style="display: none;">
   <canvas id="yaxis" width="0" height="0"></canvas>

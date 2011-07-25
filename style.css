@@ -48,7 +48,7 @@ header h1 {
   font-style: italic;
 }
 
-#menu {
+.popup {
   position: fixed;
   top: 20px;
   left: 20px;
@@ -61,12 +61,13 @@ header h1 {
   background-color: rgb(240,240,240);
   z-index: 1;
 }
-#menu h1 {
+.popup h1 {
   padding: 0.5em;
   padding-top: 0;
   font-size: 1em;
   font-weight: bold;
 }
+
 #menu ul {
   list-style-type: none;
   background-color: white;
@@ -87,4 +88,14 @@ header h1 {
 #menu a span {
   display: block;
   font-size: 0.8em;
+}
+
+#chooselocation .body {
+  background-color: white;
+  border-top: 1px solid rgb(200, 200, 200);
+  border-bottom: 1px solid rgb(200, 200, 200);
+  padding: 0.5em;
+}
+#chooselocation input {
+  padding: 0.25em;
 }
