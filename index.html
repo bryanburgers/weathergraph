@@ -94,7 +94,6 @@ header h1 {
   display: block;
   font-size: 0.8em;
 }
-
 </style>
 
 <script src="phonegap.js"></script>
@@ -143,6 +142,8 @@ data = [
 { day: "2011-07-14", hour: 12, temp: 72, apparent: 80, dew: 70, wind: 10, windDirection: "N", gust: null },
 ];
 */
+
+document.addEventListener('weathergraph.command', onCommand, false);
 
 function redraw() {
   if (!data || data.length == 0) return;
@@ -197,12 +198,30 @@ function onload() {
   }
 }
 
-function initializeMenuOption(el, menu) {
-  el.addEventListener('touchstart', function(e) {
-    mode = parseInt(el.getAttribute('data-mode'));
+function onCommand(e) {
+  var command = e.commandData.command;
+  var parameter = e.commandData.parameter;
+
+  if (command == 'mode') {
+    mode = parseInt(parameter);
     redraw();
+  }
+}
+
+function initializeMenuOption(el, menu) {
+  el.addEventListener('click', function(e) {
     menu.style.display = 'none';
     document.removeEventListener('backbutton', onBackButton, false);
+
+    var command = el.getAttribute('data-command');
+    var parameter = el.getAttribute('data-parameter');
+    var event = document.createEvent("Event");
+    event.initEvent("weathergraph.command", true, true);
+    event.commandData = {
+      'command': command,
+      'parameter': parameter
+    };
+    document.dispatchEvent(event);
   }, false);
 }
 
@@ -222,7 +241,6 @@ function onMenuButton(e) {
   {
     menu.style.display = 'block';
     document.addEventListener('backbutton', onBackButton, false);
-
   }
 }
 
@@ -335,13 +353,13 @@ function scroll(e) {
   <h1>Menu</h1>
   <ul>
     <li>
-      <a href="#" id="menuTemperatureSelect" data-command="mode" data-mode="1">
+      <a href="#" id="menuTemperatureSelect" data-command="mode" data-parameter="1">
         <strong>Temperature</strong>
         <span>Temperature, heat index, and dew point</span>
       </a>
     </li>
     <li>
-      <a href="#" id="menuWindSelect" data-command="mode" data-mode="2">
+      <a href="#" id="menuWindSelect" data-command="mode" data-parameter="2">
         <strong>Wind</strong>
         <span>Wind speed, wind direction, and gusts</span>
       </a>
