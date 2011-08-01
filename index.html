@@ -39,7 +39,7 @@ function redraw() {
 
   // If we have advertisements, subtract away that height.
   var adHeight = 0;
-  if (document.getElementById("ad"))
+  if (!!document.getElementById("ad"))
     adHeight = 48;
   g.setMaximumVerticalSpace(window.innerHeight - adHeight);
 
