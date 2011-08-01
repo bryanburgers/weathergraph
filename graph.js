@@ -158,6 +158,9 @@ SecondGriffin = window.SecondGriffin || { };
 
     canvas.width = (data.length + 1) * this.gridWidth + this.leftSpacing + this.rightSpacing;
     canvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
+    if (canvas.height + keyCanvas.height > this.maximumVerticalSpace) {
+      canvas.height = this.maximumVerticalSpace - keyCanvas.height;
+    }
     yAxisCanvas.width = 40;
     yAxisCanvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
     keyCanvas.width = window.innerWidth;
