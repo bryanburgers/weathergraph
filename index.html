@@ -7,6 +7,16 @@
 
 <script src="phonegap.js"></script>
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
+<script>
+  var admob_vars = {
+    pubid: 'a14e3711463e6e7', // publisher id
+    bgcolor: '000', // background color (hex)
+    text: 'fff', // font-color (hex)
+    test: false, // test mode, set to false to receive live ads
+    manual_mode: true
+  };
+</script>
+<script src="http://mmv.admob.com/static/iphone/iadmob.js"></script>
 <script src="weatherParser.js"></script>
 <script src="graph.js"></script>
 <script>
@@ -68,6 +78,7 @@ function onload() {
   document.getElementById('graphtype').innerText = "Temperature";
 
   refresh();
+  _admob.fetchAd(document.getElementById("ad"));
 }
 
 function refresh() {
@@ -399,6 +410,7 @@ function getTestData() {
   <header>
     <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
   </header>
+  <div id="ad"></div>
 </div>
 <div id="loading">
   <div id="message">Loading.</div>

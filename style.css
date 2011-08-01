@@ -88,3 +88,9 @@ header h1 {
   display: block;
   font-size: 0.8em;
 }
+
+#ad {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
