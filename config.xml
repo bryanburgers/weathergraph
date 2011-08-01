@@ -4,7 +4,7 @@
     id="com.secondgriffin.WeatherGraph"
     version="1.0.0">
 
-  <name short="Weather Graph">Weather Graph</name>
+  <name short="Weather Graph Pro">Weather Graph Pro</name>
   <description>An app for viewing weather.gov graph data on a mobile device.</description>
   <author email="secondgriffin@gmail.com">Second Griffin Software</author>  
   <icon src="img/icon_72.png" width="72" height="72" />
