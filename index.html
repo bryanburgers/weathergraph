@@ -36,7 +36,12 @@ function redraw() {
   if (!data || data.length == 0) return;
   g.setGridWidth(30);
   g.setMaximumGridHeight(30);
-  g.setMaximumVerticalSpace(300);
+
+  // If we have advertisements, subtract away that height.
+  var adHeight = 0;
+  if (document.getElementById("ad"))
+    adHeight = 48;
+  g.setMaximumVerticalSpace(window.innerHeight - adHeight);
 
   g.redraw(data, mode);
   document.getElementById('loaded').style.display = 'block';
