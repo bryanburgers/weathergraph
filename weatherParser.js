@@ -44,6 +44,9 @@ SecondGriffin = window.SecondGriffin || { };
       var windsTr = heatsTr.nextElementSibling;
       var winddTr = windsTr.nextElementSibling;
       var gustsTr = winddTr.nextElementSibling;
+      var skycvTr = gustsTr.nextElementSibling;
+      var preciTr = skycvTr.nextElementSibling;
+      var relhuTr = preciTr.nextElementSibling;
 
       var t = function(el, i) { return el.childNodes[i].innerText; }
 
@@ -57,6 +60,9 @@ SecondGriffin = window.SecondGriffin || { };
 	var windDir = t(winddTr, i);
 	var gustT = t(gustsTr, i);
 	var gust = gustT ? parseInt(gustT, 10) : null;
+	var skyCover = parseInt(t(skycvTr, i), 10);
+	var precPot = parseInt(t(preciTr, i), 10);
+	var humidity = parseInt(t(relhuTr, i), 10);
 
         lastDate = date;
 	var parsedDate = parseDate(date);
@@ -69,7 +75,10 @@ SecondGriffin = window.SecondGriffin || { };
           "dew": dewp,
 	  "wind": wind,
 	  "windDirection": windDir,
-	  "gust": gust
+	  "gust": gust,
+	  "skyCover": skyCover,
+	  "precip": precPot,
+	  "humidity": humidity
         });
       }
     }
