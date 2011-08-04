@@ -782,9 +782,9 @@ SecondGriffin = window.SecondGriffin || { };
 
   graph.prototype.drawSkyKey = function(ctx, rect) {
     var keyItems = [
-      { color: humidityColor, name: "Rel. Humidity (%)" },
-      { color: precipColor, name: "Pcpn. Potential (%)" },
-      { color: skyColor, name: "Sky Cover (%)" },
+      { color: humidityColor, name: "Rel. Humidity" },
+      { color: precipColor, name: "Pcpn. Potential" },
+      { color: skyColor, name: "Sky Cover" },
     ];
     this.drawKey(ctx, rect, keyItems);
   };
