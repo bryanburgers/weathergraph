@@ -8,6 +8,9 @@ SecondGriffin = window.SecondGriffin || { };
   var gustColor = "rgb(0, 0, 102)";
   var windColor = "rgb(153, 0, 153)";
   var windVeinColor = "rgb(102, 102, 102)";
+  var skyColor = "rgb(0, 0, 204)";
+  var precipColor = "rgb(153, 102, 51)";
+  var humidityColor = "rgb(0, 102, 0)";
 
   var convertToKnots = function(i) {
     return i * 0.868976242;
@@ -102,6 +105,7 @@ SecondGriffin = window.SecondGriffin || { };
 
   graph.TEMPERATURE = 1;
   graph.WIND = 2;
+  graph.SKY = 3;
 
   graph.prototype.getGraphCanvas = function() {
     return this.graphCanvas;
@@ -155,6 +159,9 @@ SecondGriffin = window.SecondGriffin || { };
     else if (mode == graph.WIND) {
       bounds.y = this.getWindLogicalYBounds(data);
     }
+    else if (mode == graph.SKY) {
+      bounds.y = this.getSkyLogicalYBounds(data);
+    }
 
     canvas.width = (data.length + 1) * this.gridWidth + this.leftSpacing + this.rightSpacing;
     canvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
@@ -193,6 +200,11 @@ SecondGriffin = window.SecondGriffin || { };
     else if (mode == graph.WIND) {
       this.drawWindData(ctx, data, graphSettings);
       this.drawWindKey(kctx, keyRect);
+    }
+    else if (mode == graph.SKY) {
+      this.drawSkyData(ctx, data, graphSettings);
+      this.drawSkyKey(kctx, keyRect);
+      yAxisSuffix = '%';
     }
 
     this.drawYAxis(yctx, data, graphSettings, yAxisSuffix);
@@ -521,6 +533,7 @@ SecondGriffin = window.SecondGriffin || { };
     };
   };
 
+
   graph.prototype.drawWindData = function(ctx, data, graphSettings) {
     ctx.save();
 
@@ -692,6 +705,86 @@ SecondGriffin = window.SecondGriffin || { };
     var keyItems = [
       { color: windColor, name: "Wind" },
       { color: gustColor, name: "Gusts" },
+    ];
+    this.drawKey(ctx, rect, keyItems);
+  };
+
+  graph.prototype.drawSkyData = function(ctx, data, graphSettings) {
+    ctx.save();
+
+    this.setDefaultGraphSettings(ctx);
+
+    // Draw lines.
+    for (var i = 1; data[i]; i++) {
+      var x1, x2, y1, y2;
+
+      x1 = graphSettings.translateX(i - 1);
+      x2 = graphSettings.translateX(i);
+
+      // Draw humidity line
+      y1 = graphSettings.translateY(data[i - 1].humidity);
+      y2 = graphSettings.translateY(data[i].humidity);
+      drawLine(ctx, x1, y1, x2, y2, humidityColor);
+
+      // Draw precip line
+      y1 = graphSettings.translateY(data[i - 1].precip);
+      y2 = graphSettings.translateY(data[i].precip);
+      drawLine(ctx, x1, y1, x2, y2, precipColor);
+
+      // Draw sky cover line
+      y1 = graphSettings.translateY(data[i - 1].skyCover);
+      y2 = graphSettings.translateY(data[i].skyCover);
+      drawLine(ctx, x1, y1, x2, y2, skyColor);
+    }
+
+    // Draw dots and text
+    for (var i = 0; data[i]; i++) {
+      ctx.fillStyle = "black";
+      var x = graphSettings.translateX(i);
+      var humidityY, precipY, skyY;
+      
+      humidityY = graphSettings.translateY(data[i].humidity);
+      precipY = graphSettings.translateY(data[i].precip);
+      skyY = graphSettings.translateY(data[i].skyCover);
+
+      // Draw humidity point
+      drawPoint(ctx, x, humidityY);
+      
+      // Draw precip point
+      drawPoint(ctx, x, precipY);
+
+      // Draw humidity point
+      drawPoint(ctx, x, skyY);
+
+      // Draw text
+      if (data[i].hour % 3 == 1) {
+        ctx.fillStyle = humidityColor;
+	drawTextAbove(ctx, x, humidityY, data[i].humidity + '%');
+
+        ctx.fillStyle = precipColor;
+	drawTextAbove(ctx, x, precipY, data[i].precip + '%');
+
+        ctx.fillStyle = skyColor;
+	drawTextAbove(ctx, x, skyY, data[i].skyCover + '%');
+      }
+    }
+
+    ctx.restore();
+  };
+
+  graph.prototype.getSkyLogicalYBounds = function(data, rect) {
+    return {
+      "min": 0,
+      "max": 100,
+      "by": 20
+    };
+  };
+
+  graph.prototype.drawSkyKey = function(ctx, rect) {
+    var keyItems = [
+      { color: humidityColor, name: "Rel. Humidity" },
+      { color: precipColor, name: "Pcpn. Potential" },
+      { color: skyColor, name: "Sky Cover" },
     ];
     this.drawKey(ctx, rect, keyItems);
   };
