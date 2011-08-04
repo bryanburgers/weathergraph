@@ -2,7 +2,7 @@
 <widget
     xmlns="http://www.w3.org/ns/widgets"
     id="com.secondgriffin.WeatherGraph"
-    version="1.0.0">
+    version="1.1.0">
 
   <name short="Weather Graph Pro">Weather Graph Pro</name>
   <description>An app for viewing weather.gov graph data on a mobile device.</description>
