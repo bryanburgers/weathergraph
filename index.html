@@ -281,7 +281,7 @@ function loadLocationName(position) {
 // Load the weather from weather.gov given the current geolocation.
 function loadData() {
   setMessage("Loading weather data.");
-  var url = "http://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=hi&w3=sfcwind&w3u=1&AheadHour=" + hoursAhead + "&FcstType=digital&textField1=" + position.latitude + "&textField2=" + position.longitude;
+  var url = "http://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=hi&w3=sfcwind&w3u=1&w4=sky&w5=pop&w6=rh&AheadHour=" + hoursAhead + "&FcstType=digital&textField1=" + position.latitude + "&textField2=" + position.longitude;
   var xhr = new XMLHttpRequest();  
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
@@ -393,6 +393,12 @@ function getTestData() {
       <a href="#" data-command="mode" data-parameter="2">
         <strong>Wind</strong>
         <span>Wind speed, wind direction, and gusts</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" data-command="mode" data-parameter="3">
+        <strong>Sky</strong>
+        <span>Sky cover, precipitation potential, and relative humidity</span>
       </a>
     </li>
     <li>

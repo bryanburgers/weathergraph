@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="48"
+     height="48"
+     version="1.1"
+     viewBox="0 0 480 480">
+  <defs>
+    <linearGradient id="graphgradient" x1="0" y1="0" x2="0" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#d9d9d9" stop-opacity="1"/>
+    </linearGradient>
+    <filter id="dropshadow" width="1.5" height="1.5" x="-0.25" y="-0.25" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="20" result="blur" />
+      <feColorMatrix result="bluralpha" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.75 0 " />
+      <feOffset in="bluralpha" dx="0" dy="10" result="offsetBlur" />
+      <feMerge>
+        <feMergeNode in="offsetBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <mask id="graphmask">
+      <rect fill="url(#graphgradient)" id="graphbackground" width="380" height="380" x="0" y="0" rx="30" ry="30" />
+    </mask>
+    <ellipse id="dot" cx="0" cy="0" rx="10.5" ry="10.5" fill="black" opacity="0.8"/>
+  </defs>
+  <g transform="translate(50,50)">
+    <use xlink:href="#graphbackground" style="filter:url(#dropshadow)"/>
+    <path id="graphlines" stroke="#a9a9a9" stroke-width="2" mask="url(#graphmask)"
+      d="M 95,0 V 380 M 190,0 V 380 M 285,0 V 380 M 0,95 H 380 M 0,190 H 380 M 0,285 h 380" />
+    <g stroke-width="12" fill="none" mask="url(#graphmask)">
+      <path id="heatPath" stroke="#b8860b" d="          M 95 119 L 190 80 L 285 90 L 390 60" />
+      <path id="tempPath" stroke="#ff0000" d="M -10 184 L 95 119 L 190 108 L 285 140 L 390 142" />
+      <path id="dewPath"  stroke="#009900" d="M -10 270 L 95 255 L 190 275 L 285 220 L 390 235" />
+    </g>
+    <g id="heatDots">
+      <use xlink:href="#dot" x="190" y="80"/>
+      <use xlink:href="#dot" x="285" y="90"/>
+    </g>
+    <g id="tempDots">
+      <use xlink:href="#dot" x="95"  y="119"/>
+      <use xlink:href="#dot" x="190" y="108"/>
+      <use xlink:href="#dot" x="285" y="140"/>
+    </g>
+    <g id="dewDots">
+      <use xlink:href="#dot" x="95"  y="255"/>
+      <use xlink:href="#dot" x="190" y="275"/>
+      <use xlink:href="#dot" x="285" y="220"/>
+    </g>
+  </g>
+</svg>
