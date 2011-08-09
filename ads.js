@@ -2,10 +2,7 @@ SecondGriffin = window.SecondGriffin || { };
 
 (function (ns) {
 
-  // These styles are direct from AdMob. They do the trick, I guess. I'm not 100% convinced on having two elements, but oh well.
-  var originalStyle = 'position: absolute; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; border-style: initial; border-color: initial; left: 0px; width:320px;height:48px;';
-
-  var spacerStyle = 'width: 100%; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; border-style: initial; border-color: initial; position: static; background-image: none; background-attachment: initial; background-origin: initial; background-clip: initial; background-color: initial; height: 48px; background-position: initial initial; background-repeat: initial initial; ';
+  var originalStyle = 'margin:0;padding:0;width:320px;height:48px;';
 
   var linkStyle = 'width: 100%; height: 100%; padding: 0; margin: 0; display: block; color: white; text-decoration: none;';
 
@@ -13,9 +10,8 @@ SecondGriffin = window.SecondGriffin || { };
 
   var customAds =
     [ { weight: 4.0, messages: ["Tired of ads?"] }
-    , { weight: 0.2, messages: ["Be kind, rewind", "Or something like that"] }
-    , { weight: 1.0, messages: ["Cheaper than a Big Mac"] }
-    , { weight: 1.0, messages: ["Cheaper than gallon of gas"] }
+    , { weight: 1.0, messages: ["Cheaper than a Big Mac."] }
+    , { weight: 1.0, messages: ["Cheaper than gallon of gas."] }
     , { weight: 0.2, messages: ["Faster than a speeding bullet", "Oh wait, that's Superman"] }
     ]
 
@@ -43,20 +39,29 @@ SecondGriffin = window.SecondGriffin || { };
     var div1 = document.createElement('div');
     div1.style.cssText = originalStyle;
 
-    var div2 = document.createElement('div');
-    div2.style.cssText = spacerStyle;
+    //var div2 = document.createElement('div');
+    //div2.style.cssText = spacerStyle;
 
     var a = document.createElement('a');
     a.style.cssText = linkStyle;
     a.href = "https://market.android.com/details?id=com.secondgriffin.WeatherGraph";
+    var img = document.createElement('img');
+    img.width = 36;
+    img.height = 36;
+    img.src = 'img/icon_36.png';
+    img.style.margin = "6px";
+    img.style.float = "left";
+    var span = document.createElement('span');
+    span.appendChild(document.createTextNode("Upgrade to Weather Graph Pro!"));
+    span.style.lineHeight = "48px";
+    a.appendChild(img);
+    a.appendChild(span);
 
     div1.style.backgroundColor = '#48f';
     div1.style.color = "#fff";
     div1.appendChild(a);
-    a.innerHTML = "Upgrade to Weather Graph Pro!";
 
     container.appendChild(div1);
-    container.appendChild(div2);
 
     // Ad flipping
     var ad = chooseCustomAd();
@@ -65,9 +70,8 @@ SecondGriffin = window.SecondGriffin || { };
     var messageIndex = messages.length - 1;
     var interval = 0;
     var switchAd = function() {
-      console.log('Switching');
       messageIndex = (messageIndex + 1) % messages.length;
-      a.innerHTML = messages[messageIndex];
+      span.innerHTML = messages[messageIndex];
     };
     var dispose = function() {
       clearInterval(interval);
