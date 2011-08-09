@@ -4,7 +4,7 @@ SecondGriffin = window.SecondGriffin || { };
 
   var originalStyle = 'margin:0;padding:0;width:320px;height:48px;';
 
-  var linkStyle = 'width: 100%; height: 100%; padding: 0; margin: 0; display: block; color: white; text-decoration: none;';
+  var linkStyle = 'width: 100%; height: 100%; padding: 0; margin: 0; display: block; color: white; text-decoration: none; background: #48f url("img/adgradient.png") repeat-x left top;';
 
   var containerId = 'ad';
 
@@ -54,11 +54,10 @@ SecondGriffin = window.SecondGriffin || { };
     var span = document.createElement('span');
     span.appendChild(document.createTextNode("Upgrade to Weather Graph Pro!"));
     span.style.lineHeight = "48px";
+    span.style.position = 'absolute';
     a.appendChild(img);
     a.appendChild(span);
 
-    div1.style.backgroundColor = '#48f';
-    div1.style.color = "#fff";
     div1.appendChild(a);
 
     container.appendChild(div1);
@@ -71,13 +70,46 @@ SecondGriffin = window.SecondGriffin || { };
     var interval = 0;
     var switchAd = function() {
       messageIndex = (messageIndex + 1) % messages.length;
-      span.innerHTML = messages[messageIndex];
+      var message = messages[messageIndex];
+
+      if (span.style.webkitTransition == null) {
+        // If we can't do fancy webkit transitions, just
+	// replace the contents of the span.
+        span.innerHTML = message;
+      }
+      else {
+        // We can do fancy webkit transitions. Therefore, we
+	// need to have two spans, and scroll them both down.
+        var oldSpan = span;
+        span = document.createElement('span');
+	span.style.webkitTransform = 'translate(0px, -48px)';
+	span.style.opacity = '0';
+	span.style.webkitTransition = 'all 1s ease';
+	span.style.position = 'absolute';
+	span.style.lineHeight = '48px';
+	oldSpan.style.webkitTransition = 'all 1s ease';
+	span.innerHTML = message;
+	a.appendChild(span);
+	setTimeout(function() {
+	  span.style.webkitTransform = '';
+	  span.style.opacity = '';
+          oldSpan.style.webkitTransition = 'all 1s ease';
+	  oldSpan.style.opacity = '0';
+	  oldSpan.style.webkitTransform = 'translate(0px, 48px)';
+	  // When the transition is done, remove the span (so we don't end up with tons of them)
+	  oldSpan.addEventListener('webkitTransitionEnd', function(e) {
+	    if (e.propertyName == '-webkit-transform') {
+	      a.removeChild(oldSpan);
+	    }
+	  }, false);
+	}, 100);
+      }
     };
     var dispose = function() {
       clearInterval(interval);
     };
     div1.dispose = dispose;
-    var interval = setInterval(switchAd, 4000);
+    var interval = setInterval(switchAd, 6000);
     switchAd();
   }, false);
 
@@ -90,7 +122,6 @@ SecondGriffin = window.SecondGriffin || { };
     
     var d = new Date();
     function to() {
-      console.log("Checking for ad.");
       if (adResult.adEl.height == 48) {
         // We have an ad, so replace the old ad with the new ad.
         while (container.firstChild != ad) {
