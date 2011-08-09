@@ -82,12 +82,12 @@ SecondGriffin = window.SecondGriffin || { };
     var container = document.getElementById(containerId);
     container.appendChild(ad);
     ad.style.display = 'none';
-    _admob.fetchAd(ad);
+    var adResult = _admob.fetchAd(ad);
     
     var d = new Date();
     function to() {
       console.log("Checking for ad.");
-      if (ad.childNodes.length > 0) {
+      if (adResult.adEl.height == 48) {
         // We have an ad, so replace the old ad with the new ad.
         while (container.firstChild != ad) {
 	  if (container.firstChild.dispose) {
@@ -104,6 +104,9 @@ SecondGriffin = window.SecondGriffin || { };
         if (new Date() - d < 10000) {
           setTimeout(to, 500);
         }
+	else {
+	  container.removeChild(ad); // Remove the child since we failed to get anything worthwhile
+	}
       }
     }
 
