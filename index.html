@@ -110,6 +110,7 @@ function onCommand(e) {
   }
   else if (command == 'changelocation') {
     document.getElementById('chooselocation').style.display = "block";
+    document.getElementById('locationTextbox').focus();
   }
 }
 
@@ -158,6 +159,7 @@ function onModeChange(e) {
 }
 
 function onChooseLocation(e) {
+  e.preventDefault();
   var location = document.getElementById('locationTextbox').value;
   var g = new google.maps.Geocoder();
   g.geocode({ 'address': location }, function(results, status) {
@@ -434,11 +436,9 @@ function getTestData() {
     </li>
   </ul>
 </div>
-<div id="chooselocation" class="popup" style="display: none;">
-  <h1>Find a location</h1>
+<div id="chooselocation" class="overlay" style="display: none;">
   <div class="body">
-    <p><input type="text" id="locationTextbox" placeholder="City or zip-code"></input></p>
-    <p><input type="button" id="locationButton" value="Graph"></input></p>
+    <p><input type="text" id="locationTextbox" placeholder="City or zip-code"></input> <a href="#" id="locationButton">Graph</a></p>
   </div>
 </div>
 <div id="loaded" style="display: none;">

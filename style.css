@@ -90,12 +90,30 @@ header h1 {
   font-size: 0.8em;
 }
 
-#chooselocation .body {
-  background-color: white;
-  border-top: 1px solid rgb(200, 200, 200);
-  border-bottom: 1px solid rgb(200, 200, 200);
+.overlay {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+
+  background-color: black;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#666), to(#222));
+  z-index: 1;
+}
+.overlay h1 {
   padding: 0.5em;
+}
+#chooselocation .body {
+  margin: 0.25em;
+  color: white;
+}
+#chooselocation a {
+  color: white;
+  text-decoration: none;
 }
 #chooselocation input {
   padding: 0.25em;
+}
+#chooselocation input:focused {
+  outline: none;
 }
