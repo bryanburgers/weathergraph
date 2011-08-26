@@ -214,6 +214,7 @@ function initializeMenuOption(el, menu) {
 function onDeviceReady(e) {
   // Event handler for the menu button
   document.addEventListener('menubutton', onMenuButton, false);
+  document.addEventListener('searchbutton', onSearchButton, false);
 }
 
 // Raised when the Menu Button on and Android device is pressed.
@@ -231,13 +232,28 @@ function onMenuButton(e) {
   }
 }
 
+function onSearchButton(e) {
+  var chooseLocation = document.getElementById('chooselocation');
+  if (chooseLocation.style.display == 'block')
+  {
+    chooseLocation.style.display = 'none';
+    document.removeEventListener('backbutton', onBackButton, false);
+  }
+  else {
+    chooseLocation.style.display = 'block';
+    document.addEventListener('backbutton', onBackButton, false);
+  }
+}
+
 // Raised when the Back Button on and Android device is pressed.
 function onBackButton(e) {
   // If the menu is showing, hide it. Otherwise, ignore this button.
   var menu = document.getElementById('menu');
-  if (menu.style.display == 'block')
+  var chooseLocation = document.getElementById('chooselocation');
+  if (menu.style.display == 'block' || chooseLocation.style.display == 'block')
   {
     menu.style.display = 'none';
+    chooseLocation.style.display = 'none';
     document.removeEventListener('backbutton', onBackButton, false);
     e.preventDefault();
   }
@@ -328,13 +344,16 @@ function loadData() {
 // Set a user-message when finding the location and loading data.
 function setMessage(text) {
   var message = document.getElementById("message");
+  var loaded = document.getElementById("loaded");
   if (!message) return;
   
   if (!!text) {
+    loaded.style.display = "none";
     message.innerText = text;
     message.style.display = "block";
   }
   else {
+    loaded.style.display = "";
     message.innerText = "";
     message.style.display = "none";
   }
