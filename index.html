@@ -80,16 +80,16 @@ function refresh() {
     navigator.geolocation.getCurrentPosition(
       function (success) {
         var event = document.createEvent("Event");
-	event.initEvent("weathergraph.geolocate");
-	event.success = true;
-	event.coords = success.coords;
-	document.dispatchEvent(event);
+        event.initEvent("weathergraph.geolocate");
+        event.success = true;
+        event.coords = success.coords;
+        document.dispatchEvent(event);
       },
       function (failure) {
         var event = document.createEvent("Event");
-	event.initEvent("weathergraph.geolocate");
-	event.success = false;
-	document.dispatchEvent(event);
+        event.initEvent("weathergraph.geolocate");
+        event.success = false;
+        document.dispatchEvent(event);
       }
     );
   }
@@ -179,7 +179,7 @@ function chooseLocation() {
       var gLocation = results[0].geometry.location;
       var location = {
         'latitude': gLocation.lat(),
-	'longitude': gLocation.lng()
+        'longitude': gLocation.lng()
       };
       console.log(location);
       var event = document.createEvent("Event");
@@ -189,6 +189,7 @@ function chooseLocation() {
       document.dispatchEvent(event);
     }
     else {
+      setMessage('Google was unable to find ' + location);
     }
   });
   document.getElementById('loaded').style.display = "none";
@@ -336,13 +337,23 @@ function loadData() {
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
       if (xhr.status == 200) {
-        var newData = new SecondGriffin.WeatherParser().parse(xhr.responseText);
-        data = data.concat(newData);
-	hoursAhead += newData.length;
-        setMessage(null);
-        redraw();
-	// Allow for loading more data when we scroll far enough.
-        window.addEventListener("scroll", scroll, false);
+        try {
+          var newData = new SecondGriffin.WeatherParser().parse(xhr.responseText);
+          if (newData.length == 0) {
+            setMessage("Failed to get weather data.");
+          }
+          else {
+            data = data.concat(newData);
+            hoursAhead += newData.length;
+            setMessage(null);
+            redraw();
+            // Allow for loading more data when we scroll far enough.
+            window.addEventListener("scroll", scroll, false);
+          }
+        }
+        catch (err) {
+          setMessage("Failed to get weather data.");
+        }
       }
       else {
         setMessage("Failed to get weather data.");
@@ -460,7 +471,7 @@ function getTestData() {
     <li>
       <a href="#" data-command="changelocation">
         <strong>Change location</strong>
-	<span>Search for a new location manually</span>
+        <span>Search for a new location manually</span>
       </a>
     </li>
   </ul>
