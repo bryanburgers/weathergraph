@@ -67,6 +67,7 @@ function onload() {
   // Set the default graph type.
   document.getElementById('graphtype').innerText = "Temperature";
   document.getElementById('locationButton').addEventListener('click', onChooseLocation, false);
+  document.getElementById('locationTextbox').addEventListener('keydown', onLocationTextboxKeyDown, false);
 
   refresh();
 }
@@ -160,6 +161,17 @@ function onModeChange(e) {
 
 function onChooseLocation(e) {
   e.preventDefault();
+  chooseLocation();
+}
+
+function onLocationTextboxKeyDown(e) {
+  if (e.which == 13 || e.keyCode == 13) {
+    e.preventDefault();
+    chooseLocation();
+  }
+}
+
+function chooseLocation() {
   var location = document.getElementById('locationTextbox').value;
   var g = new google.maps.Geocoder();
   g.geocode({ 'address': location }, function(results, status) {
@@ -179,6 +191,7 @@ function onChooseLocation(e) {
     else {
     }
   });
+  document.getElementById('loaded').style.display = "none";
   document.getElementById('chooselocation').style.display = "none";
 }
 
@@ -344,16 +357,13 @@ function loadData() {
 // Set a user-message when finding the location and loading data.
 function setMessage(text) {
   var message = document.getElementById("message");
-  var loaded = document.getElementById("loaded");
   if (!message) return;
   
   if (!!text) {
-    loaded.style.display = "none";
     message.innerText = text;
     message.style.display = "block";
   }
   else {
-    loaded.style.display = "";
     message.innerText = "";
     message.style.display = "none";
   }
