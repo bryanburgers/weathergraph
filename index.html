@@ -234,10 +234,16 @@ function onDeviceReady(e) {
 // Raised when the Menu Button on and Android device is pressed.
 function onMenuButton(e) {
   var menu = document.getElementById('menu');
+  var chooseLocation = document.getElementById('chooselocation');
   if (menu.style.display == 'block')
   {
     menu.style.display = 'none';
     document.removeEventListener('backbutton', onBackButton, false);
+  }
+  else if (chooseLocation.style.display == 'block') {
+    menu.style.display = 'block';
+    chooseLocation.style.display = 'none';
+    // Back button is already enabled.
   }
   else
   {
@@ -247,11 +253,17 @@ function onMenuButton(e) {
 }
 
 function onSearchButton(e) {
+  var menu = document.getElementById('menu');
   var chooseLocation = document.getElementById('chooselocation');
   if (chooseLocation.style.display == 'block')
   {
     chooseLocation.style.display = 'none';
     document.removeEventListener('backbutton', onBackButton, false);
+  }
+  else if (menu.style.display == 'block') {
+    menu.style.display = 'none';
+    chooseLocation.style.display = 'block';
+    // Back button is already enabled.
   }
   else {
     chooseLocation.style.display = 'block';
