@@ -66,6 +66,8 @@ function onload() {
 
   // Set the default graph type.
   document.getElementById('graphtype').innerText = "Temperature";
+  document.getElementById('locationButton').addEventListener('click', onChooseLocation, false);
+  document.getElementById('locationTextbox').addEventListener('keydown', onLocationTextboxKeyDown, false);
 
   refresh();
 }
@@ -78,16 +80,16 @@ function refresh() {
     navigator.geolocation.getCurrentPosition(
       function (success) {
         var event = document.createEvent("Event");
-	event.initEvent("weathergraph.geolocate");
-	event.success = true;
-	event.coords = success.coords;
-	document.dispatchEvent(event);
+        event.initEvent("weathergraph.geolocate");
+        event.success = true;
+        event.coords = success.coords;
+        document.dispatchEvent(event);
       },
       function (failure) {
         var event = document.createEvent("Event");
-	event.initEvent("weathergraph.geolocate");
-	event.success = false;
-	document.dispatchEvent(event);
+        event.initEvent("weathergraph.geolocate");
+        event.success = false;
+        document.dispatchEvent(event);
       }
     );
   }
@@ -106,6 +108,10 @@ function onCommand(e) {
   }
   else if (command == 'refresh') {
     refresh();
+  }
+  else if (command == 'changelocation') {
+    document.getElementById('chooselocation').style.display = "block";
+    document.getElementById('locationTextbox').focus();
   }
 }
 
@@ -153,6 +159,43 @@ function onModeChange(e) {
   }
 }
 
+function onChooseLocation(e) {
+  e.preventDefault();
+  chooseLocation();
+}
+
+function onLocationTextboxKeyDown(e) {
+  if (e.which == 13 || e.keyCode == 13) {
+    e.preventDefault();
+    chooseLocation();
+  }
+}
+
+function chooseLocation() {
+  var location = document.getElementById('locationTextbox').value;
+  var g = new google.maps.Geocoder();
+  g.geocode({ 'address': location }, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      var gLocation = results[0].geometry.location;
+      var location = {
+        'latitude': gLocation.lat(),
+        'longitude': gLocation.lng()
+      };
+      console.log(location);
+      var event = document.createEvent("Event");
+      event.initEvent("weathergraph.geolocate");
+      event.success = true;
+      event.coords = location; 
+      document.dispatchEvent(event);
+    }
+    else {
+      setMessage('Google was unable to find ' + location);
+    }
+  });
+  document.getElementById('loaded').style.display = "none";
+  document.getElementById('chooselocation').style.display = "none";
+}
+
 // Initialize the menu to handle event commands
 function initializeMenuOptions() {
   // Initialize the menu options
@@ -185,15 +228,22 @@ function initializeMenuOption(el, menu) {
 function onDeviceReady(e) {
   // Event handler for the menu button
   document.addEventListener('menubutton', onMenuButton, false);
+  document.addEventListener('searchbutton', onSearchButton, false);
 }
 
 // Raised when the Menu Button on and Android device is pressed.
 function onMenuButton(e) {
   var menu = document.getElementById('menu');
+  var chooseLocation = document.getElementById('chooselocation');
   if (menu.style.display == 'block')
   {
     menu.style.display = 'none';
     document.removeEventListener('backbutton', onBackButton, false);
+  }
+  else if (chooseLocation.style.display == 'block') {
+    menu.style.display = 'block';
+    chooseLocation.style.display = 'none';
+    // Back button is already enabled.
   }
   else
   {
@@ -202,13 +252,34 @@ function onMenuButton(e) {
   }
 }
 
+function onSearchButton(e) {
+  var menu = document.getElementById('menu');
+  var chooseLocation = document.getElementById('chooselocation');
+  if (chooseLocation.style.display == 'block')
+  {
+    chooseLocation.style.display = 'none';
+    document.removeEventListener('backbutton', onBackButton, false);
+  }
+  else if (menu.style.display == 'block') {
+    menu.style.display = 'none';
+    chooseLocation.style.display = 'block';
+    // Back button is already enabled.
+  }
+  else {
+    chooseLocation.style.display = 'block';
+    document.addEventListener('backbutton', onBackButton, false);
+  }
+}
+
 // Raised when the Back Button on and Android device is pressed.
 function onBackButton(e) {
   // If the menu is showing, hide it. Otherwise, ignore this button.
   var menu = document.getElementById('menu');
-  if (menu.style.display == 'block')
+  var chooseLocation = document.getElementById('chooselocation');
+  if (menu.style.display == 'block' || chooseLocation.style.display == 'block')
   {
     menu.style.display = 'none';
+    chooseLocation.style.display = 'none';
     document.removeEventListener('backbutton', onBackButton, false);
     e.preventDefault();
   }
@@ -278,13 +349,23 @@ function loadData() {
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
       if (xhr.status == 200) {
-        var newData = new SecondGriffin.WeatherParser().parse(xhr.responseText);
-        data = data.concat(newData);
-	hoursAhead += newData.length;
-        setMessage(null);
-        redraw();
-	// Allow for loading more data when we scroll far enough.
-        window.addEventListener("scroll", scroll, false);
+        try {
+          var newData = new SecondGriffin.WeatherParser().parse(xhr.responseText);
+          if (newData.length == 0) {
+            setMessage("Failed to get weather data.");
+          }
+          else {
+            data = data.concat(newData);
+            hoursAhead += newData.length;
+            setMessage(null);
+            redraw();
+            // Allow for loading more data when we scroll far enough.
+            window.addEventListener("scroll", scroll, false);
+          }
+        }
+        catch (err) {
+          setMessage("Failed to get weather data.");
+        }
       }
       else {
         setMessage("Failed to get weather data.");
@@ -372,7 +453,7 @@ function getTestData() {
 </script>
 </head>
 <body onload="onload()">
-<div id="menu" style="display: none;">
+<div id="menu" class="popup" style="display: none;">
   <h1>Menu</h1>
   <ul>
     <li>
@@ -400,6 +481,11 @@ function getTestData() {
       </a>
     </li>
   </ul>
+</div>
+<div id="chooselocation" class="overlay" style="display: none;">
+  <div class="body">
+    <p><input type="text" id="locationTextbox" placeholder="City or zip-code"></input> <a href="#" id="locationButton">Graph</a></p>
+  </div>
 </div>
 <div id="loaded" style="display: none;">
   <canvas id="yaxis" width="0" height="0"></canvas>
