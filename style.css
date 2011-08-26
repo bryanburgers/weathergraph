@@ -48,7 +48,7 @@ header h1 {
   font-style: italic;
 }
 
-#menu {
+.popup {
   position: fixed;
   top: 20px;
   left: 20px;
@@ -61,12 +61,13 @@ header h1 {
   background-color: rgb(240,240,240);
   z-index: 1;
 }
-#menu h1 {
+.popup h1 {
   padding: 0.5em;
   padding-top: 0;
   font-size: 1em;
   font-weight: bold;
 }
+
 #menu ul {
   list-style-type: none;
   background-color: white;
@@ -93,4 +94,32 @@ header h1 {
   position: fixed;
   bottom: 0;
   left: 0;
+}
+
+.overlay {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+
+  background-color: black;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#666), to(#222));
+  z-index: 1;
+}
+.overlay h1 {
+  padding: 0.5em;
+}
+#chooselocation .body {
+  margin: 0.25em;
+  color: white;
+}
+#chooselocation a {
+  color: white;
+  text-decoration: none;
+}
+#chooselocation input {
+  padding: 0.25em;
+}
+#chooselocation input:focused {
+  outline: none;
 }

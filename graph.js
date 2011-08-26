@@ -411,7 +411,7 @@ SecondGriffin = window.SecondGriffin || { };
   
         var max = Math.max(temp, apparent, dew);
         var min = Math.min(temp, apparent, dew);
-        var logMax = Math.ceil((max + 0.5) / 10) * 10;
+        var logMax = Math.ceil((max + 5.5) / 10) * 10;
         var logMin = Math.floor((min - 5.5) / 10) * 10;
         minY = Math.min(minY, logMin);
         maxY = Math.max(maxY, logMax);
@@ -522,7 +522,7 @@ SecondGriffin = window.SecondGriffin || { };
       var gust = data[i].gust || 0;
   
       var max = Math.max(wind, gust);
-      var logMax = Math.ceil((max + 0.5) / 10) * 10;
+      var logMax = Math.ceil((max + 5.5) / 10) * 10;
       maxY = Math.max(maxY, logMax);
     }
   
