@@ -2,7 +2,10 @@
 <widget
     xmlns="http://www.w3.org/ns/widgets"
     id="com.secondgriffin.WeatherGraph.Testing"
-    version="1.2.0">
+    version="1.2.0"
+    
+    xmlns:gap = "http://phonegap.com/ns/1.0"
+    >
 
   <name short="Weather Graph Test">Weather Graph Test</name>
   <description>An app for viewing weather.gov graph data on a mobile device.</description>
@@ -13,4 +16,5 @@
   <content src="index.html"/>
   <feature name="http://api.phonegap.com/1.0/network"/>
   <feature name="http://api.phonegap.com/1.0/geolocation"/>
+  <preference name="orientation" value="landscape" />
 </widget>
