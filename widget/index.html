@@ -70,6 +70,7 @@ function onload() {
   document.getElementById('locationTextbox').addEventListener('keydown', onLocationTextboxKeyDown, false);
 
   refresh();
+  //redraw();
 }
 
 function refresh() {
@@ -397,7 +398,7 @@ function setMessage(text) {
 // load more data if we can.
 function scroll(e) {
   var rightEdge = window.pageXOffset + window.innerWidth;
-  if (rightEdge > document.getElementById("graph").width - 40) {
+  if (rightEdge > parseInt(document.getElementById("graph").getAttribute("data-truewidth")) - 40) {
     window.removeEventListener("scroll", scroll, false);
     if (position != null && hoursAhead <= 96) { // Weather.gov accepts a query for 96, but nothing after that.
       loadData();
