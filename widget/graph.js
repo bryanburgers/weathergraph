@@ -48,7 +48,7 @@ SecondGriffin = window.SecondGriffin || { };
     this.bounds = { "x": xBounds, "y": yBounds };
     this.graphArea = rectangle;
     this.grid = { "width": gridWidth, "height": gridHeight };
-  }
+  };
   GraphSettings.prototype.translateX = function(i) {
     var tx = (i + 1 - this.bounds.x.min) * this.grid.width + this.graphArea.x; // The actual value.
     return Math.round(tx) - 0.5; // Rendering looks better if it's exactly on a half pixel.
@@ -74,7 +74,7 @@ SecondGriffin = window.SecondGriffin || { };
     this.bottom = y + height;
     this.right = x + width;
     return this;
-  }
+  };
 
   var graph = function(graphCanvas, yAxisCanvas, keyCanvas) {
     this.graphCanvas = graphCanvas;
@@ -145,6 +145,8 @@ SecondGriffin = window.SecondGriffin || { };
   };
 
   graph.prototype.redraw = function(data, mode) {
+    var dpr = window.devicePixelRatio;
+
     var canvas = this.graphCanvas;
     var ctx = canvas.getContext("2d");
     var yAxisCanvas = this.yAxisCanvas;
@@ -163,11 +165,18 @@ SecondGriffin = window.SecondGriffin || { };
       bounds.y = this.getSkyLogicalYBounds(data);
     }
 
-    canvas.width = (data.length + 1) * this.gridWidth + this.leftSpacing + this.rightSpacing;
-    canvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
-    if (canvas.height + keyCanvas.height > this.maximumVerticalSpace) {
-      canvas.height = this.maximumVerticalSpace - keyCanvas.height;
+    canvasWidth = (data.length + 1) * this.gridWidth + this.leftSpacing + this.rightSpacing;
+    canvasHeight = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
+    if (canvasHeight + keyCanvas.height > this.maximumVerticalSpace) {
+      canvasHeight = this.maximumVerticalSpace - keyCanvas.height;
     }
+
+    canvas.width = canvasWidth * dpr;
+    canvas.height = canvasHeight * dpr;
+    canvas.style.width = canvasWidth + "px";
+    canvas.style.height = canvasHeight + "px";
+    ctx.scale(dpr, dpr);
+
     yAxisCanvas.width = 40;
     yAxisCanvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
     keyCanvas.width = window.innerWidth;
@@ -176,8 +185,8 @@ SecondGriffin = window.SecondGriffin || { };
     var rect = new Rectangle(
       this.leftSpacing,
       this.topSpacing,
-      canvas.width - this.leftSpacing - this.rightSpacing,
-      canvas.height - this.topSpacing - this.bottomSpacing - this.horizontalAxisHeight);
+      canvasWidth - this.leftSpacing - this.rightSpacing,
+      canvasHeight - this.topSpacing - this.bottomSpacing - this.horizontalAxisHeight);
 
     var keyRect = new Rectangle(0, 0, keyCanvas.width, keyCanvas.height);
 
@@ -288,7 +297,7 @@ SecondGriffin = window.SecondGriffin || { };
       ctx.beginPath();
       ctx.moveTo(tx, graphSettings.graphArea.top);
       ctx.lineTo(tx, graphSettings.graphArea.bottom);
-      ctx.stroke();   
+      ctx.stroke();
     }
 
     // Make a border around the graph.
@@ -302,7 +311,7 @@ SecondGriffin = window.SecondGriffin || { };
     ctx.stroke();
 
     ctx.restore();
-  }
+  };
 
   graph.prototype.drawXAxis = function(ctx, data, graphSettings) {
     var drawCenteredText = function(ctx, tx, ty, text) {
@@ -321,17 +330,17 @@ SecondGriffin = window.SecondGriffin || { };
     ctx.save();
 
     var translateHour = function(hour) {
-      if (hour == 0) return "12 midnight";
+      if (hour === 0) return "12 midnight";
       if (hour == 12) return "12 noon";
       if (hour < 12) return hour.toString() + " am";
       return (hour - 12).toString() + " pm";
-    }
+    };
 
     for (var i = 0; data[i]; i++) {
       if (data[i].hour % 3 == 1) {
         var tx = graphSettings.translateX(i);
         var ty = graphSettings.graphArea.bottom + 15;
-        if (i == 0) {
+        if (i === 0) {
           // If it's really the first one, then we can't center it, because
           // then our line for the date will cut right though it.
           drawLeftAlignedText(ctx, tx + 2, ty, translateHour(data[i].hour));
@@ -341,7 +350,7 @@ SecondGriffin = window.SecondGriffin || { };
           drawCenteredText(ctx, tx, ty, translateHour(data[i].hour));
         }
       }
-      if (data[i].hour == 0 || i == 0) {
+      if (data[i].hour === 0 || i === 0) {
         var tx = graphSettings.translateX(i);
         var ty = graphSettings.graphArea.bottom + 32;
 
@@ -389,11 +398,11 @@ SecondGriffin = window.SecondGriffin || { };
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.restore();
 
-    ctx.save();    
+    ctx.save();
 
     var startY = Math.floor(graphSettings.bounds.y.min / 10) * 10;
     for (var y = startY; y <= graphSettings.bounds.y.max; y += graphSettings.bounds.y.by) {
-      var ty = graphSettings.translateY(y);                 
+      var ty = graphSettings.translateY(y);
       drawRightAlignedText(ctx, ctx.canvas.width - 2, ty + 3, y.toString() + suffix);
     }
 
@@ -419,8 +428,8 @@ SecondGriffin = window.SecondGriffin || { };
   
       return {
         "min": minY,
-	"max": maxY,
-	"by": 10
+        "max": maxY,
+        "by": 10
       };
     }
   };
@@ -489,7 +498,7 @@ SecondGriffin = window.SecondGriffin || { };
       if (data[i].hour % 3 == 1) {
         // Draw dew text, if necessary
         if (data[i].dew != data[i].temp) {
-	  ctx.fillStyle = dewColor;
+    ctx.fillStyle = dewColor;
 	  drawTextBelow(ctx, x, dewY, data[i].dew.toString() + '\u00b0');
 	}
 
