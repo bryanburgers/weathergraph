@@ -144,9 +144,19 @@ SecondGriffin = window.SecondGriffin || { };
     return Math.round(ty) - 0.5; // Rendering looks better if it's exactly on a half pixel.
   };
 
-  graph.prototype.redraw = function(data, mode) {
+  graph.prototype.setCanvasSize = function(canvas, ctx, width, height) {
     var dpr = window.devicePixelRatio;
 
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    canvas.setAttribute("data-truewidth", width);
+    canvas.setAttribute("data-trueheight", height);
+    ctx.scale(dpr, dpr);
+  };
+
+  graph.prototype.redraw = function(data, mode) {
     var canvas = this.graphCanvas;
     var ctx = canvas.getContext("2d");
     var yAxisCanvas = this.yAxisCanvas;
@@ -165,24 +175,21 @@ SecondGriffin = window.SecondGriffin || { };
       bounds.y = this.getSkyLogicalYBounds(data);
     }
 
-    canvasWidth = (data.length + 1) * this.gridWidth + this.leftSpacing + this.rightSpacing;
-    canvasHeight = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
+    var canvasWidth = (data.length + 1) * this.gridWidth + this.leftSpacing + this.rightSpacing;
+    var canvasHeight = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
     if (canvasHeight + keyCanvas.height > this.maximumVerticalSpace) {
       canvasHeight = this.maximumVerticalSpace - keyCanvas.height;
     }
 
-    canvas.width = canvasWidth * dpr;
-    canvas.height = canvasHeight * dpr;
-    canvas.style.width = canvasWidth + "px";
-    canvas.style.height = canvasHeight + "px";
-    canvas.setAttribute("data-truewidth", canvasWidth);
-    canvas.setAttribute("data-trueheight", canvasHeight);
-    ctx.scale(dpr, dpr);
+    this.setCanvasSize(canvas, ctx, canvasWidth, canvasHeight);
 
-    yAxisCanvas.width = 40;
-    yAxisCanvas.height = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
-    keyCanvas.width = window.innerWidth;
-    keyCanvas.style.top = canvas.height.toString() + "px";
+    var yAxisCanvasWidth = 40;
+    var yAxisCanvasHeight = ((bounds.y.max - bounds.y.min) / bounds.y.by) * this.maximumGridHeight + this.topSpacing + this.bottomSpacing + this.horizontalAxisHeight;
+    this.setCanvasSize(yAxisCanvas, yctx, yAxisCanvasWidth, yAxisCanvasHeight);
+    var keyCanvasWidth = window.innerWidth;
+    var keyCanvasHeight = 22;
+    this.setCanvasSize(keyCanvas, kctx, keyCanvasWidth, keyCanvasHeight);
+    keyCanvas.style.top = canvasHeight.toString() + "px";
 
     var rect = new Rectangle(
       this.leftSpacing,
@@ -190,7 +197,7 @@ SecondGriffin = window.SecondGriffin || { };
       canvasWidth - this.leftSpacing - this.rightSpacing,
       canvasHeight - this.topSpacing - this.bottomSpacing - this.horizontalAxisHeight);
 
-    var keyRect = new Rectangle(0, 0, keyCanvas.width, keyCanvas.height);
+    var keyRect = new Rectangle(0, 0, keyCanvasWidth, keyCanvasHeight);
 
     var graphSettings = new GraphSettings(bounds.x, bounds.y, rect, rect.width / (bounds.x.max - bounds.x.min), rect.height / (bounds.y.max - bounds.y.min));
 
@@ -395,9 +402,12 @@ SecondGriffin = window.SecondGriffin || { };
       }
     };
 
+    var canvasWidth = parseInt(ctx.canvas.getAttribute("data-truewidth"), 10);
+    var canvasHeight = parseInt(ctx.canvas.getAttribute("data-trueheight"), 10);
+
     ctx.save();
     ctx.fillStyle = "rgba(255,255,255,0.75)";
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     ctx.restore();
 
     ctx.save();
@@ -405,7 +415,7 @@ SecondGriffin = window.SecondGriffin || { };
     var startY = Math.floor(graphSettings.bounds.y.min / 10) * 10;
     for (var y = startY; y <= graphSettings.bounds.y.max; y += graphSettings.bounds.y.by) {
       var ty = graphSettings.translateY(y);
-      drawRightAlignedText(ctx, ctx.canvas.width - 2, ty + 3, y.toString() + suffix);
+      drawRightAlignedText(ctx, canvasWidth - 2, ty + 3, y.toString() + suffix);
     }
 
     ctx.restore();
