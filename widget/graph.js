@@ -175,6 +175,8 @@ SecondGriffin = window.SecondGriffin || { };
     canvas.height = canvasHeight * dpr;
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
+    canvas.setAttribute("data-truewidth", canvasWidth);
+    canvas.setAttribute("data-trueheight", canvasHeight);
     ctx.scale(dpr, dpr);
 
     yAxisCanvas.width = 40;
