@@ -249,13 +249,13 @@ SecondGriffin = window.SecondGriffin || { };
     var fillBackground = function(i) {
       var xStart = graphSettings.translateX(i - 0.5, rect);
       var xEnd = graphSettings.translateX(i + 12.5, rect);
-    
+
       var gradient2 = ctx.createLinearGradient(xStart, 0, xEnd, 0);
       gradient2.addColorStop(0, this.dayBackground);
       gradient2.addColorStop(1/13, this.nightBackground);
       gradient2.addColorStop(12/13, this.nightBackground);
       gradient2.addColorStop(1, this.dayBackground);
-    
+
       //ctx.fillStyle = "rgb(200,200,200)";
       ctx.fillStyle = gradient2;
       ctx.fillRect(xStart, rect.y, xEnd - xStart, rect.height);
@@ -282,7 +282,7 @@ SecondGriffin = window.SecondGriffin || { };
       }
     }
 
-    
+
     ctx.restore();
   };
 
@@ -346,20 +346,21 @@ SecondGriffin = window.SecondGriffin || { };
     };
 
     for (var i = 0; data[i]; i++) {
-      if (data[i].hour % 3 == 1) {
+      var date = new Date(data[i].date);
+      if (date.getHours() % 3 == 1) {
         var tx = graphSettings.translateX(i);
         var ty = graphSettings.graphArea.bottom + 15;
         if (i === 0) {
           // If it's really the first one, then we can't center it, because
           // then our line for the date will cut right though it.
-          drawLeftAlignedText(ctx, tx + 2, ty, translateHour(data[i].hour));
+          drawLeftAlignedText(ctx, tx + 2, ty, translateHour(date.getHours()));
         }
         else {
           // Usually, we want our text centered on the line.
-          drawCenteredText(ctx, tx, ty, translateHour(data[i].hour));
+          drawCenteredText(ctx, tx, ty, translateHour(date.getHours()));
         }
       }
-      if (data[i].hour === 0 || i === 0) {
+      if (date.getHours() === 0 || i === 0) {
         var tx = graphSettings.translateX(i);
         var ty = graphSettings.graphArea.bottom + 32;
 
@@ -367,7 +368,7 @@ SecondGriffin = window.SecondGriffin || { };
           // Only draw the date if it isn't going to overlap the next date (data[i].hour < 20)
           // and as long as we aren't going to run into the end
           // of the graph (i < data.length - 4)
-          drawLeftAlignedText(ctx, tx + 3, ty, data[i].day);
+          drawLeftAlignedText(ctx, tx + 3, ty, date.toLocaleDateString());
         }
 
         ctx.save();
@@ -378,7 +379,7 @@ SecondGriffin = window.SecondGriffin || { };
         ctx.stroke();
         ctx.restore();
       }
-      else if (data[i].hour == 12 && i > 5) {
+      else if (date.getHours() == 12 && i > 5) {
         // Draw the date again at noon, as long as we didn't
         // just draw the date initially, (i > 4)
         // and as long as we aren't going to run into the end
@@ -386,7 +387,7 @@ SecondGriffin = window.SecondGriffin || { };
         if (i > 4 && i < data.length - 4) {
           var tx = graphSettings.translateX(i);
           var ty = graphSettings.graphArea.bottom + 32;
-          drawLeftAlignedText(ctx, tx + 3, ty, data[i].day);
+          drawLeftAlignedText(ctx, tx + 3, ty, date.toLocaleDateString());
         }
       }
     }
@@ -426,18 +427,18 @@ SecondGriffin = window.SecondGriffin || { };
       var minY = 1000;
       var maxY = -200;
       for (var i = 0; data[i]; i++) {
-        var temp = data[i].temp;
-        var apparent = data[i].apparent;
-        var dew = data[i].dew;
-  
-        var max = Math.max(temp, apparent, dew);
-        var min = Math.min(temp, apparent, dew);
+        var temperature = data[i].temperature;
+        var headIndex = data[i].headIndex || data[i].temperature;
+        var dewPoint = data[i].dewPoint;
+
+        var max = Math.max(temperature, headIndex, dewPoint);
+        var min = Math.min(temperature, headIndex, dewPoint);
         var logMax = Math.ceil((max + 5.5) / 10) * 10;
         var logMin = Math.floor((min - 5.5) / 10) * 10;
         minY = Math.min(minY, logMin);
         maxY = Math.max(maxY, logMax);
       }
-  
+
       return {
         "min": minY,
         "max": maxY,
@@ -464,24 +465,24 @@ SecondGriffin = window.SecondGriffin || { };
     for (var i = 1; data[i]; i++) {
       var x1, x2, y1, y2;
 
-      // Draw dew line
+      // Draw dewPoint line
       x1 = graphSettings.translateX(i - 1);
       x2 = graphSettings.translateX(i);
-      y1 = graphSettings.translateY(data[i - 1].dew);
-      y2 = graphSettings.translateY(data[i].dew);
+      y1 = graphSettings.translateY(data[i - 1].dewPoint);
+      y2 = graphSettings.translateY(data[i].dewPoint);
       drawLine(ctx, x1, y1, x2, y2, dewColor);
 
       // Draw heat index line, if necessary
       // Only draw the line if it's different from the temperature line.
-      if (data[i].apparent != data[i].temp || data[i-1].apparent != data[i-1].temp) {
-        y1 = graphSettings.translateY(data[i - 1].apparent);
-        y2 = graphSettings.translateY(data[i].apparent);
+      if (data[i].headIndex != data[i].temperature || data[i-1].headIndex != data[i-1].temperature) {
+        y1 = graphSettings.translateY(data[i - 1].headIndex);
+        y2 = graphSettings.translateY(data[i].headIndex);
         drawLine(ctx, x1, y1, x2, y2, heatColor);
       }
 
-      // Draw temp line
-      y1 = graphSettings.translateY(data[i - 1].temp);
-      y2 = graphSettings.translateY(data[i].temp);
+      // Draw temperature line
+      y1 = graphSettings.translateY(data[i - 1].temperature);
+      y2 = graphSettings.translateY(data[i].temperature);
       drawLine(ctx, x1, y1, x2, y2, tempColor);
     }
 
@@ -490,37 +491,37 @@ SecondGriffin = window.SecondGriffin || { };
       ctx.fillStyle = "black";
       var x = graphSettings.translateX(i);
       var dewY, heatY, tempY;
-      
-      // Draw dew point, if necessary
-      if (data[i].dew != data[i].temp) {
-        dewY = graphSettings.translateY(data[i].dew);
+
+      // Draw dewPoint point, if necessary
+      if (data[i].dewPoint != data[i].temperature) {
+        dewY = graphSettings.translateY(data[i].dewPoint);
         drawPoint(ctx, x, dewY);
       }
 
       // Draw heat index point, if necessary
-      if (data[i].apparent != data[i].temp) {
-        heatY = graphSettings.translateY(data[i].apparent);
+      if (data[i].headIndex != data[i].temperature) {
+        heatY = graphSettings.translateY(data[i].headIndex);
         drawPoint(ctx, x, heatY);
       }
 
       // Draw temperature point
-      tempY = graphSettings.translateY(data[i].temp);
+      tempY = graphSettings.translateY(data[i].temperature);
       drawPoint(ctx, x, tempY);
 
       if (data[i].hour % 3 == 1) {
-        // Draw dew text, if necessary
-        if (data[i].dew != data[i].temp) {
+        // Draw dewPoint text, if necessary
+        if (data[i].dewPoint != data[i].temperature) {
     ctx.fillStyle = dewColor;
-	  drawTextBelow(ctx, x, dewY, data[i].dew.toString() + '\u00b0');
+	  drawTextBelow(ctx, x, dewY, data[i].dewPoint.toString() + '\u00b0');
 	}
 
-	if (data[i].apparent != data[i].temp) {
+	if (data[i].headIndex != data[i].temperature) {
 	  ctx.fillStyle = heatColor;
-	  drawTextAbove(ctx, x, heatY, data[i].apparent.toString() + '\u00b0');
+	  drawTextAbove(ctx, x, heatY, data[i].headIndex.toString() + '\u00b0');
 	}
 
         ctx.fillStyle = tempColor;
-	drawTextAbove(ctx, x, tempY, data[i].temp.toString() + '\u00b0');
+	drawTextAbove(ctx, x, tempY, data[i].temperature.toString() + '\u00b0');
       }
     }
 
@@ -531,7 +532,7 @@ SecondGriffin = window.SecondGriffin || { };
     var keyItems = [
       { color: tempColor, name: "Temperature" },
       { color: heatColor, name: "Heat index" },
-      { color: dewColor, name: "Dew point" }
+      { color: dewColor, name: "dewPoint point" }
     ];
     this.drawKey(ctx, rect, keyItems);
   };
@@ -539,14 +540,14 @@ SecondGriffin = window.SecondGriffin || { };
   graph.prototype.getWindLogicalYBounds = function(data, rect) {
     var maxY = 40;
     for (var i = 0; data[i]; i++) {
-      var wind = data[i].wind;
+      var wind = data[i].windSpeed;
       var gust = data[i].gust || 0;
-  
+
       var max = Math.max(wind, gust);
       var logMax = Math.ceil((max + 5.5) / 10) * 10;
       maxY = Math.max(maxY, logMax);
     }
-  
+
     return {
       "min": 0,
       "max": maxY,
@@ -679,8 +680,8 @@ SecondGriffin = window.SecondGriffin || { };
       }
 
       // Draw wind line
-      y1 = graphSettings.translateY(data[i - 1].wind);
-      y2 = graphSettings.translateY(data[i].wind);
+      y1 = graphSettings.translateY(data[i - 1].windSpeed);
+      y2 = graphSettings.translateY(data[i].windSpeed);
       drawLine(ctx, x1, y1, x2, y2, windColor);
 
     }
@@ -690,17 +691,17 @@ SecondGriffin = window.SecondGriffin || { };
       ctx.fillStyle = "black";
       var x = graphSettings.translateX(i);
       var gustY, windY;
-      
+
       // Draw gust point, if necessary
-      if (!!data[i].gust && data[i].gust != data[i].wind) {
+      if (!!data[i].gust && data[i].gust != data[i].windSpeed) {
         gustY = graphSettings.translateY(data[i].gust);
         drawPoint(ctx, x, gustY);
       }
 
       // Draw wind vein
-      windY = graphSettings.translateY(data[i].wind);
+      windY = graphSettings.translateY(data[i].windSpeed);
       ctx.strokeStyle = windVeinColor;
-      drawWindVein(ctx, x, windY, data[i].wind, data[i].windDirection);
+      drawWindVein(ctx, x, windY, data[i].windSpeed, data[i].windDirection);
 
       // Draw wind point
       drawPoint(ctx, x, windY);
@@ -709,13 +710,13 @@ SecondGriffin = window.SecondGriffin || { };
       // Draw text
       if (data[i].hour % 3 == 1) {
         // Draw gust text, if necessary
-        if (!!data[i].gust && data[i].gust != data[i].wind) {
+        if (!!data[i].gust && data[i].gust != data[i].windSpeed) {
 	  ctx.fillStyle = gustColor;
 	  drawTextBelow(ctx, x, gustY, data[i].gust);
 	}
 
         ctx.fillStyle = windColor;
-	drawTextBelow(ctx, x, windY, data[i].wind);
+	drawTextBelow(ctx, x, windY, data[i].windSpeed);
       }
     }
 
@@ -743,13 +744,13 @@ SecondGriffin = window.SecondGriffin || { };
       x2 = graphSettings.translateX(i);
 
       // Draw humidity line
-      y1 = graphSettings.translateY(data[i - 1].humidity);
-      y2 = graphSettings.translateY(data[i].humidity);
+      y1 = graphSettings.translateY(data[i - 1].relativeHumidity);
+      y2 = graphSettings.translateY(data[i].relativeHumidity);
       drawLine(ctx, x1, y1, x2, y2, humidityColor);
 
       // Draw precip line
-      y1 = graphSettings.translateY(data[i - 1].precip);
-      y2 = graphSettings.translateY(data[i].precip);
+      y1 = graphSettings.translateY(data[i - 1].precipitation);
+      y2 = graphSettings.translateY(data[i].precipitation);
       drawLine(ctx, x1, y1, x2, y2, precipColor);
 
       // Draw sky cover line
@@ -763,27 +764,27 @@ SecondGriffin = window.SecondGriffin || { };
       ctx.fillStyle = "black";
       var x = graphSettings.translateX(i);
       var humidityY, precipY, skyY;
-      
-      humidityY = graphSettings.translateY(data[i].humidity);
-      precipY = graphSettings.translateY(data[i].precip);
+
+      humidityY = graphSettings.translateY(data[i].relativeHumidity);
+      precipY = graphSettings.translateY(data[i].precipitation);
       skyY = graphSettings.translateY(data[i].skyCover);
 
-      // Draw humidity point
+      // Draw relativeHumidity point
       drawPoint(ctx, x, humidityY);
-      
-      // Draw precip point
+
+      // Draw precipitation point
       drawPoint(ctx, x, precipY);
 
-      // Draw humidity point
+      // Draw relativeHumidity point
       drawPoint(ctx, x, skyY);
 
       // Draw text
       if (data[i].hour % 3 == 1) {
         ctx.fillStyle = humidityColor;
-	drawTextAbove(ctx, x, humidityY, data[i].humidity + '%');
+	drawTextAbove(ctx, x, humidityY, data[i].relativeHumidity + '%');
 
         ctx.fillStyle = precipColor;
-	drawTextAbove(ctx, x, precipY, data[i].precip + '%');
+	drawTextAbove(ctx, x, precipY, data[i].precipitation + '%');
 
         ctx.fillStyle = skyColor;
 	drawTextAbove(ctx, x, skyY, data[i].skyCover + '%');
@@ -842,9 +843,9 @@ SecondGriffin = window.SecondGriffin || { };
     ctx.save();
 
     var things = [
-        { "prop": "dew", "propText": "dew", "color": "rgb(0, 153, 0)" },
-        { "prop": "apparent", "propText": "apparent", "color": "rgb(184, 134, 11)" },
-        { "prop": "temp", "propText": "temp", color: "rgb(255, 0, 0)" }        
+        { "prop": "dewPoint", "propText": "dewPoint", "color": "rgb(0, 153, 0)" },
+        { "prop": "headIndex", "propText": "headIndex", "color": "rgb(184, 134, 11)" },
+        { "prop": "temperature", "propText": "temperature", color: "rgb(255, 0, 0)" }
         ];
 
     for (var t = 0; things[t]; t++) {
@@ -856,7 +857,7 @@ SecondGriffin = window.SecondGriffin || { };
         var x = this.translateX(i, rect);
         var y = this.translateY(data[i][prop], rect);
         if (i == 0) { ctx.moveTo(x, y); }
-        else { ctx.lineTo(x, y); }      
+        else { ctx.lineTo(x, y); }
       }
 
       ctx.stroke();

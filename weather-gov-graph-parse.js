@@ -1,4 +1,4 @@
-var Q = require('Q');
+var Q = require('q');
 
 var fetch = require('./forecast-fetch');
 var parse = require('./forecast-parse');

@@ -2,12 +2,10 @@
 <html>
 <head>
 <title>Graph</title>
-<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=0;" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
 <link rel="stylesheet" href="style.css" />
 
-<script src="phonegap.js"></script>
-<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
-<script src="weatherParser.js"></script>
+<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <script src="graph.js"></script>
 <script>
 
@@ -23,9 +21,6 @@ var mode = SecondGriffin.WeatherGraph.TEMPERATURE;
 
 // The user's current geolocation.
 var position = null;
-
-// How much data we've loaded from weather.gov.
-var hoursAhead = 0;
 
 // If we're debugging, use this to get some test data.
 // Otherwise, comment this out.
@@ -49,8 +44,6 @@ function redraw() {
 
 // Called when the HTML is all loaded and ready.
 function onload() {
-  // Event handler for when PhoneGap is ready
-  document.addEventListener('deviceready', onDeviceReady, false);
 
   // Prepare our menu options.
   initializeMenuOptions();
@@ -68,6 +61,8 @@ function onload() {
   document.getElementById('graphtype').innerText = "Temperature";
   document.getElementById('locationButton').addEventListener('click', onChooseLocation, false);
   document.getElementById('locationTextbox').addEventListener('keydown', onLocationTextboxKeyDown, false);
+
+  document.getElementById('header').addEventListener('click', onHeaderClick, false);
 
   refresh();
   //redraw();
@@ -93,6 +88,21 @@ function refresh() {
         document.dispatchEvent(event);
       }
     );
+  }
+}
+
+function onHeaderClick(e) {
+  if (mode === SecondGriffin.WeatherGraph.TEMPERATURE) {
+    setMode(SecondGriffin.WeatherGraph.SKY);
+    redraw();
+  }
+  else if (mode === SecondGriffin.WeatherGraph.SKY) {
+    setMode(SecondGriffin.WeatherGraph.WIND);
+    redraw();
+  }
+  else if (mode === SecondGriffin.WeatherGraph.WIND) {
+    setMode(SecondGriffin.WeatherGraph.TEMPERATURE);
+    redraw();
   }
 }
 
@@ -182,11 +192,10 @@ function chooseLocation() {
         'latitude': gLocation.lat(),
         'longitude': gLocation.lng()
       };
-      console.log(location);
       var event = document.createEvent("Event");
       event.initEvent("weathergraph.geolocate");
       event.success = true;
-      event.coords = location; 
+      event.coords = location;
       document.dispatchEvent(event);
     }
     else {
@@ -225,67 +234,6 @@ function initializeMenuOption(el, menu) {
   }, false);
 }
 
-// Raised when the PhoneGap is ready.
-function onDeviceReady(e) {
-  // Event handler for the menu button
-  document.addEventListener('menubutton', onMenuButton, false);
-  document.addEventListener('searchbutton', onSearchButton, false);
-}
-
-// Raised when the Menu Button on and Android device is pressed.
-function onMenuButton(e) {
-  var menu = document.getElementById('menu');
-  var chooseLocation = document.getElementById('chooselocation');
-  if (menu.style.display == 'block')
-  {
-    menu.style.display = 'none';
-    document.removeEventListener('backbutton', onBackButton, false);
-  }
-  else if (chooseLocation.style.display == 'block') {
-    menu.style.display = 'block';
-    chooseLocation.style.display = 'none';
-    // Back button is already enabled.
-  }
-  else
-  {
-    menu.style.display = 'block';
-    document.addEventListener('backbutton', onBackButton, false);
-  }
-}
-
-function onSearchButton(e) {
-  var menu = document.getElementById('menu');
-  var chooseLocation = document.getElementById('chooselocation');
-  if (chooseLocation.style.display == 'block')
-  {
-    chooseLocation.style.display = 'none';
-    document.removeEventListener('backbutton', onBackButton, false);
-  }
-  else if (menu.style.display == 'block') {
-    menu.style.display = 'none';
-    chooseLocation.style.display = 'block';
-    // Back button is already enabled.
-  }
-  else {
-    chooseLocation.style.display = 'block';
-    document.addEventListener('backbutton', onBackButton, false);
-  }
-}
-
-// Raised when the Back Button on and Android device is pressed.
-function onBackButton(e) {
-  // If the menu is showing, hide it. Otherwise, ignore this button.
-  var menu = document.getElementById('menu');
-  var chooseLocation = document.getElementById('chooselocation');
-  if (menu.style.display == 'block' || chooseLocation.style.display == 'block')
-  {
-    menu.style.display = 'none';
-    chooseLocation.style.display = 'none';
-    document.removeEventListener('backbutton', onBackButton, false);
-    e.preventDefault();
-  }
-}
-
 // Get the location name based on the user's geolocation.
 // This function raises the 'weathergraph.locationnamechange'
 // event each time it determines a name for the location.
@@ -314,7 +262,6 @@ function loadLocationName(position) {
         if (found) break;
 
         var result = results[i];
-        console.log(result);
 
         for (var j = 0; result.types[j]; j++) {
           if (found) break;
@@ -345,23 +292,20 @@ function loadLocationName(position) {
 // Load the weather from weather.gov given the current geolocation.
 function loadData() {
   setMessage("Loading weather data.");
-  var url = "http://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=hi&w3=sfcwind&w3u=1&w4=sky&w5=pop&w6=rh&AheadHour=" + hoursAhead + "&FcstType=digital&textField1=" + position.latitude + "&textField2=" + position.longitude;
-  var xhr = new XMLHttpRequest();  
+  var url = "/data?latitude=" + position.latitude + "&longitude=" + position.longitude;
+  var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
       if (xhr.status == 200) {
         try {
-          var newData = new SecondGriffin.WeatherParser().parse(xhr.responseText);
+          var newData = JSON.parse(xhr.responseText).data;
           if (newData.length == 0) {
             setMessage("Failed to get weather data.");
           }
           else {
-            data = data.concat(newData);
-            hoursAhead += newData.length;
+            data = newData;
             setMessage(null);
             redraw();
-            // Allow for loading more data when we scroll far enough.
-            window.addEventListener("scroll", scroll, false);
           }
         }
         catch (err) {
@@ -372,7 +316,6 @@ function loadData() {
         setMessage("Failed to get weather data.");
       }
     }
-    console.log(xhr);
   };
   xhr.open("GET", url, true);
   xhr.send(null);
@@ -382,7 +325,7 @@ function loadData() {
 function setMessage(text) {
   var message = document.getElementById("message");
   if (!message) return;
-  
+
   if (!!text) {
     message.innerText = text;
     message.style.display = "block";
@@ -492,7 +435,7 @@ function getTestData() {
   <canvas id="yaxis" width="0" height="0"></canvas>
   <canvas id="graph" width="0" height="0"></canvas>
   <canvas id="key" width="150" height="22"></canvas>
-  <header>
+  <header id="header">
     <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
   </header>
 </div>
