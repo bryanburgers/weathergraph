@@ -347,20 +347,20 @@ SecondGriffin = window.SecondGriffin || { };
 
     for (var i = 0; data[i]; i++) {
       var date = new Date(data[i].date);
-      if (date.getHours() % 3 == 1) {
+      if (date.getUTCHours() % 3 == 1) {
         var tx = graphSettings.translateX(i);
         var ty = graphSettings.graphArea.bottom + 15;
         if (i === 0) {
           // If it's really the first one, then we can't center it, because
           // then our line for the date will cut right though it.
-          drawLeftAlignedText(ctx, tx + 2, ty, translateHour(date.getHours()));
+          drawLeftAlignedText(ctx, tx + 2, ty, translateHour(date.getUTCHours()));
         }
         else {
           // Usually, we want our text centered on the line.
-          drawCenteredText(ctx, tx, ty, translateHour(date.getHours()));
+          drawCenteredText(ctx, tx, ty, translateHour(date.getUTCHours()));
         }
       }
-      if (date.getHours() === 0 || i === 0) {
+      if (date.getUTCHours() === 0 || i === 0) {
         var tx = graphSettings.translateX(i);
         var ty = graphSettings.graphArea.bottom + 32;
 
@@ -379,7 +379,7 @@ SecondGriffin = window.SecondGriffin || { };
         ctx.stroke();
         ctx.restore();
       }
-      else if (date.getHours() == 12 && i > 5) {
+      else if (date.getUTCHours() == 12 && i > 5) {
         // Draw the date again at noon, as long as we didn't
         // just draw the date initially, (i > 4)
         // and as long as we aren't going to run into the end
