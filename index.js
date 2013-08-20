@@ -2,7 +2,7 @@ var http = require('http');
 var static = require('node-static');
 var url = require('url');
 
-var gp = require('./weather-gov-graph-parse');
+var gp = require('weather-gov-graph-parse');
 
 var file = new static.Server('./httpdocs', { cache: 300 });
 
