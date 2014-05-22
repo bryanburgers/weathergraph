@@ -532,7 +532,7 @@ SecondGriffin = window.SecondGriffin || { };
     var keyItems = [
       { color: tempColor, name: "Temperature" },
       { color: heatColor, name: "Heat index" },
-      { color: dewColor, name: "dewPoint point" }
+      { color: dewColor, name: "Dew point" }
     ];
     this.drawKey(ctx, rect, keyItems);
   };
