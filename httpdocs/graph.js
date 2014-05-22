@@ -451,8 +451,7 @@ SecondGriffin = window.SecondGriffin || { };
     ctx.lineWidth = 1.5;
     ctx.shadowColor = "rgba(0,0,0,0.3)";
     ctx.shadowBlur = 3;
-    // For some reason, the shadow is opposite on Android.
-    ctx.shadowOffsetY = -2;
+    ctx.shadowOffsetY = 2;
     ctx.shadowOffsetX = 0;
   };
 
