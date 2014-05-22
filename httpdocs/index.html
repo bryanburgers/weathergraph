@@ -62,7 +62,7 @@ function onload() {
   window.addEventListener("resize", redraw, false);
 
   // Set the default graph type.
-  document.getElementById('graphtype').innerText = "Temperature";
+  document.getElementById('graphtype').textContent = "Temperature";
   document.getElementById('locationButton').addEventListener('click', onChooseLocation, false);
   document.getElementById('locationTextbox').addEventListener('keydown', onLocationTextboxKeyDown, false);
 
@@ -79,15 +79,13 @@ function refresh() {
   if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
     navigator.geolocation.getCurrentPosition(
       function (success) {
-        var event = document.createEvent("Event");
-        event.initEvent("weathergraph.geolocate");
+        var event = new Event("weathergraph.geolocate");
         event.success = true;
         event.coords = success.coords;
         document.dispatchEvent(event);
       },
       function (failure) {
-        var event = document.createEvent("Event");
-        event.initEvent("weathergraph.geolocate");
+        var event = new Event("weathergraph.geolocate");
         event.success = false;
         document.dispatchEvent(event);
       }
@@ -143,8 +141,7 @@ function onGeolocate(e) {
   }
   else {
     setMessage("Failed to retrieve location.");
-    var event = document.createEvent("Event");
-    event.initEvent("weathergraph.locationnamechange", true, true);
+    var event = new Event("weathergraph.locationnamechange", { bubbles: true, cancelable: true });
     event.locationName = "Failed to retrieve location";
     document.dispatchEvent(event);
   }
@@ -153,7 +150,7 @@ function onGeolocate(e) {
 // Called when the user's geolocation name changes.
 document.addEventListener('weathergraph.locationnamechange', onLocationNameChange, false);
 function onLocationNameChange(e) {
-  document.getElementById("location").innerText = e.locationName;
+  document.getElementById("location").textContent = e.locationName;
 }
 
 // Called when the graph mode changes.
@@ -163,13 +160,13 @@ function onModeChange(e) {
   if (!graphtype) { return; }
   switch (mode) {
     case SecondGriffin.WeatherGraph.TEMPERATURE:
-      graphtype.innerText = 'Temperature';
+      graphtype.textContent = 'Temperature';
       break;
     case SecondGriffin.WeatherGraph.WIND:
-      graphtype.innerText = 'Wind';
+      graphtype.textContent = 'Wind';
       break;
     case SecondGriffin.WeatherGraph.SKY:
-      graphtype.innerText = 'Sky';
+      graphtype.textContent = 'Sky';
       break;
   }
 }
@@ -196,8 +193,7 @@ function chooseLocation() {
         'latitude': gLocation.lat(),
         'longitude': gLocation.lng()
       };
-      var event = document.createEvent("Event");
-      event.initEvent("weathergraph.geolocate");
+      var event = new Event("weathergraph.geolocate");
       event.success = true;
       event.coords = location;
       document.dispatchEvent(event);
@@ -228,8 +224,7 @@ function initializeMenuOption(el, menu) {
 
     var command = el.getAttribute('data-command');
     var parameter = el.getAttribute('data-parameter');
-    var event = document.createEvent("Event");
-    event.initEvent("weathergraph.command", true, true);
+    var event = new Event("weathergraph.command", { bubbles: true, cancelable: true });
     event.commandData = {
       'command': command,
       'parameter': parameter
@@ -247,8 +242,7 @@ function initializeMenuOption(el, menu) {
 function loadLocationName(position) {
 
   function raiseLocationNameChangedEvent(locationName) {
-    var event = document.createEvent("Event");
-    event.initEvent("weathergraph.locationnamechange", true, true);
+    var event = new Event("weathergraph.locationnamechange", { bubbles: true, cancelable: true });
     event.locationName = locationName;
     document.dispatchEvent(event);
   }
@@ -331,11 +325,11 @@ function setMessage(text) {
   if (!message) return;
 
   if (!!text) {
-    message.innerText = text;
+    message.textContent = text;
     message.style.display = "block";
   }
   else {
-    message.innerText = "";
+    message.textContent = "";
     message.style.display = "none";
   }
 }
@@ -356,8 +350,7 @@ function scroll(e) {
 // Set the mode for the graph to use.
 function setMode(m) {
   mode = m;
-  var event = document.createEvent("Event");
-  event.initEvent("weathergraph.modechange", true, true);
+  var event = new Event("weathergraph.modechange", { bubbles: true, cancelable: true });
   document.dispatchEvent(event);
 }
 
