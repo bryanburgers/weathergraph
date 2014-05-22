@@ -60,4 +60,12 @@ var server = http.createServer(function(request, response) {
 	}
 });
 var port = process.env.PORT || 2000;
-server.listen(port);
+server.listen(port, function(err) {
+	if (err) {
+		console.log(err);
+		console.log(err.stack);
+		return;
+	}
+
+	console.log("Listening on port " + port);
+});
