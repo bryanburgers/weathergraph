@@ -94,7 +94,7 @@ SecondGriffin = window.SecondGriffin || { };
     this.dayBackground = "rgb(245,245,245)";
     this.nightBackground = "rgb(220,220,220)";
 
-    this.topSpacing = 18;
+    this.topSpacing = 45;
     this.leftSpacing = 30;
     this.rightSpacing = 10;
     this.bottomSpacing = 0;

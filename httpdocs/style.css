@@ -26,24 +26,44 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  text-align: center;
+  height: 44px;
+  background: white;
+  overflow: hidden;
 }
 
 header h1 {
-  display: inline-block;
-  margin: 0 auto;
-  border-bottom-left-radius: 1em;
-  border-bottom-right-radius: 1em;
-  background-color: rgba(255,255,255,0.75);
-  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  padding: 0 1em;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 132px;
+  padding-left: 44px;
+  line-height: 44px;
 }
 
 header h1 {
   font-size: 1em;
   font-weight: normal;
 }
+
+header #modebuttons {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+header #modebuttons button {
+  float: left;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: green;
+}
+header #modebuttons button[data-mode="1"] { background: rgb(255, 0, 0); }
+header #modebuttons button[data-mode="2"] { background: rgb(153, 0, 153); }
+header #modebuttons button[data-mode="3"] { background: rgb(0, 102, 0); }
+
 #graphtype {
   font-style: italic;
 }

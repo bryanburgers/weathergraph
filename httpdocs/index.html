@@ -66,7 +66,7 @@ function onload() {
   document.getElementById('locationButton').addEventListener('click', onChooseLocation, false);
   document.getElementById('locationTextbox').addEventListener('keydown', onLocationTextboxKeyDown, false);
 
-  document.getElementById('header').addEventListener('click', onHeaderClick, false);
+  document.getElementById('modebuttons').addEventListener('click', onChooseMode, false);
 
   refresh();
   //redraw();
@@ -93,19 +93,11 @@ function refresh() {
   }
 }
 
-function onHeaderClick(e) {
-  if (mode === SecondGriffin.WeatherGraph.TEMPERATURE) {
-    setMode(SecondGriffin.WeatherGraph.SKY);
-    redraw();
-  }
-  else if (mode === SecondGriffin.WeatherGraph.SKY) {
-    setMode(SecondGriffin.WeatherGraph.WIND);
-    redraw();
-  }
-  else if (mode === SecondGriffin.WeatherGraph.WIND) {
-    setMode(SecondGriffin.WeatherGraph.TEMPERATURE);
-    redraw();
-  }
+function onChooseMode(e) {
+  var button = e.target;
+  var mode = parseInt(button.getAttribute('data-mode'), 10);
+  setMode(mode);
+  redraw();
 }
 
 // Called when a command is triggered.
@@ -429,12 +421,16 @@ function getTestData() {
   </div>
 </div>
 <div id="loaded" style="display: none;">
+  <header id="header">
+    <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
+    <div id="modebuttons">
+    <button data-mode="1"></button>
+    <button data-mode="2"></button>
+    <button data-mode="3"></button>
+  </header>
   <canvas id="yaxis" width="0" height="0"></canvas>
   <canvas id="graph" width="0" height="0"></canvas>
   <canvas id="key" width="150" height="22"></canvas>
-  <header id="header">
-    <h1><span id="location"></span> &ndash; <span id="graphtype"></span></h1>
-  </header>
 </div>
 <div id="loading">
   <div id="message">Loading.</div>
