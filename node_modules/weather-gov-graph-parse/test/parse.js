@@ -79,4 +79,24 @@ describe('parse', function() {
 			done();
 		});
 	});
+
+	it ('returns the correct dates', function(done) {
+		parse(dump, function(err, data) {
+			var currentYear = new Date().getFullYear();
+
+			data[0].date.should.be.above(new Date(currentYear, 7, 16, 12, 30));
+			data[0].date.should.be.below(new Date(currentYear, 7, 16, 13, 30));
+
+			data[11].date.should.be.above(new Date(currentYear, 7, 16, 23, 30));
+			data[11].date.should.be.below(new Date(currentYear, 7, 17,  0, 30));
+
+			data[24].date.should.be.above(new Date(currentYear, 7, 17, 12, 30));
+			data[24].date.should.be.below(new Date(currentYear, 7, 17, 13, 30));
+
+			data[35].date.should.be.above(new Date(currentYear, 7, 17, 23, 30));
+			data[35].date.should.be.below(new Date(currentYear, 7, 18,  0, 30));
+
+			done();
+		});
+	});
 });

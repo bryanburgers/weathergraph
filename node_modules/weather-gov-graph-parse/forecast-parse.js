@@ -71,7 +71,7 @@ module.exports = function parse(data, callback) {
 	var tdcount = 0;
 
 	var state = SEARCHFORTABLE;
-	var lastDate = null;
+	var lastDates = [];
 	var dataParts = [];
 
 	var parser = new htmlparser.Parser({
@@ -151,12 +151,22 @@ module.exports = function parse(data, callback) {
 						break;
 					}
 					else if (field.name === 'date') {
-						lastDate = parseDate(text);
+						lastDates[tdc] = parseDate(text);
 					}
 					else if (field.name === 'hour') {
+						var lastDate = lastDates[tdc];
+
+						// Not every column has a date associated with it. So
+						// we need to visit previous columns until we find the
+						// correct date to use.
+						var dateIndex = tdc;
+						while (!lastDate && dateIndex >= 0) {
+							dateIndex--;
+							lastDate = lastDates[dateIndex];
+						}
+
 						var date = new Date(lastDate.valueOf());
 						date.setHours(parseInt(text, 10));
-						// Um, this doesn't seem to be working right.
 
 						if (!dataParts[tdc]) {
 							dataParts[tdc] = {};
