@@ -7,8 +7,23 @@ var gp = require('weather-gov-graph-parse');
 var file = new static.Server('./httpdocs', { cache: 300 });
 
 function fixDate(obj) {
-	obj.date = obj.date.toJSON().replace(/Z$/, '');
+	var formattedDate = pad(obj.date.getFullYear(), 4) + '-' +
+		pad(obj.date.getMonth() + 1) + '-' +
+		pad(obj.date.getDate()) + 'T' +
+		pad(obj.date.getHours()) + ':' +
+		pad(obj.date.getMinutes()) + ':' +
+		pad(obj.date.getSeconds());
+	obj.date = formattedDate;
 	return obj;
+}
+
+function pad(t, len) {
+	len = len || 2;
+	var ret = t.toString();
+	while (ret.length < len) {
+		ret = '0' + ret;
+	}
+	return ret;
 }
 
 var server = http.createServer(function(request, response) {

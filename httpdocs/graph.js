@@ -12,6 +12,25 @@ SecondGriffin = window.SecondGriffin || { };
   var precipColor = "rgb(153, 102, 51)";
   var humidityColor = "rgb(0, 102, 0)";
 
+  var displayDate = function(d) {
+    var months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+
+    return d.getUTCDate() + ' ' + months[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+  };
+
   var convertToKnots = function(i) {
     return i * 0.868976242;
   };
@@ -347,28 +366,28 @@ SecondGriffin = window.SecondGriffin || { };
 
     for (var i = 0; data[i]; i++) {
       var date = new Date(data[i].date);
-      if (date.getHours() % 3 == 1) {
+      if (date.getUTCHours() % 3 == 1) {
         var tx = graphSettings.translateX(i);
         var ty = graphSettings.graphArea.bottom + 15;
         if (i === 0) {
           // If it's really the first one, then we can't center it, because
           // then our line for the date will cut right though it.
-          drawLeftAlignedText(ctx, tx + 2, ty, translateHour(date.getHours()));
+          drawLeftAlignedText(ctx, tx + 2, ty, translateHour(date.getUTCHours()));
         }
         else {
           // Usually, we want our text centered on the line.
-          drawCenteredText(ctx, tx, ty, translateHour(date.getHours()));
+          drawCenteredText(ctx, tx, ty, translateHour(date.getUTCHours()));
         }
       }
-      if (date.getHours() === 0 || i === 0) {
+      if (date.getUTCHours() === 0 || i === 0) {
         var tx = graphSettings.translateX(i);
         var ty = graphSettings.graphArea.bottom + 32;
 
-        if (data[i].hour < 20 && i < data.length - 4) {
+        if (date.getUTCHours() < 20 && i < data.length - 4) {
           // Only draw the date if it isn't going to overlap the next date (data[i].hour < 20)
           // and as long as we aren't going to run into the end
           // of the graph (i < data.length - 4)
-          drawLeftAlignedText(ctx, tx + 3, ty, date.toLocaleDateString());
+          drawLeftAlignedText(ctx, tx + 3, ty, displayDate(date));
         }
 
         ctx.save();
@@ -387,7 +406,7 @@ SecondGriffin = window.SecondGriffin || { };
         if (i > 4 && i < data.length - 4) {
           var tx = graphSettings.translateX(i);
           var ty = graphSettings.graphArea.bottom + 32;
-          drawLeftAlignedText(ctx, tx + 3, ty, date.toLocaleDateString());
+          drawLeftAlignedText(ctx, tx + 3, ty, displayDate(date));
         }
       }
     }
